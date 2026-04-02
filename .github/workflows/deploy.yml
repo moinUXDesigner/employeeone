@@ -3,7 +3,8 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches:
-      - master   # change if your branch is different
+      - main
+      - master   # keep master if your repo is still using master
 
 permissions:
   contents: read
