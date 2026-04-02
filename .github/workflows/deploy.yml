@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - master   # keep master if your repo is still using master
+  workflow_dispatch:
 
 permissions:
   contents: read
