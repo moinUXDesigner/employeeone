@@ -1,0 +1,140 @@
+Section 3A
+{
+  "section": "Personal Attributes",
+  "total_weightage": 100,
+  "attributes": [
+    {
+      "sl_no": 1,
+      "attribute": "Integrity & Ethics",
+      "rating": null,
+      "short_remark": null,
+      "weightage_percent": 15,
+      "score": null
+    },
+    {
+      "sl_no": 2,
+      "attribute": "Discipline / Dependability",
+      "rating": null,
+      "short_remark": null,
+      "weightage_percent": 15,
+      "score": null
+    },
+    {
+      "sl_no": 3,
+      "attribute": "Communication / Perception / Understanding Capabilities",
+      "rating": null,
+      "short_remark": null,
+      "weightage_percent": 15,
+      "score": null
+    },
+    {
+      "sl_no": 4,
+      "attribute": "Creativity",
+      "rating": null,
+      "short_remark": null,
+      "weightage_percent": 10,
+      "score": null
+    },
+    {
+      "sl_no": 5,
+      "attribute": "Teamwork / Collaboration",
+      "rating": null,
+      "short_remark": null,
+      "weightage_percent": 15,
+      "score": null
+    },
+    {
+      "sl_no": 6,
+      "attribute": "Initiative / Proactiveness",
+      "rating": null,
+      "short_remark": null,
+      "weightage_percent": 10,
+      "score": null
+    },
+    {
+      "sl_no": 7,
+      "attribute": "Stakeholder / Consumer Orientation",
+      "rating": null,
+      "short_remark": null,
+      "weightage_percent": 10,
+      "score": null
+    },
+    {
+      "sl_no": 8,
+      "attribute": "Punctuality / Promptness",
+      "rating": null,
+      "short_remark": null,
+      "weightage_percent": 10,
+      "score": null
+    }
+  ],
+  "total_score": null
+}
+
+
+Section 3B
+
+{
+  "section": "Functional Competency",
+  "total_weightage": 100,
+  "competencies": [
+    {
+      "sl_no": 1,
+      "competency": "Job Knowledge / Domain Capability",
+      "rating": null,
+      "short_remark": null,
+      "weightage_percent": 20,
+      "score": null
+    },
+    {
+      "sl_no": 2,
+      "competency": "Planning & Organizing",
+      "rating": null,
+      "short_remark": null,
+      "weightage_percent": 15,
+      "score": null
+    },
+    {
+      "sl_no": 3,
+      "competency": "Problem Solving / Decision Support",
+      "rating": null,
+      "short_remark": null,
+      "weightage_percent": 15,
+      "score": null
+    },
+    {
+      "sl_no": 4,
+      "competency": "Quality Orientation",
+      "rating": null,
+      "short_remark": null,
+      "weightage_percent": 10,
+      "score": null
+    },
+    {
+      "sl_no": 5,
+      "competency": "Safety & Compliance Orientation",
+      "rating": null,
+      "short_remark": null,
+      "weightage_percent": 15,
+      "score": null
+    },
+    {
+      "sl_no": 6,
+      "competency": "Digital / Systems Usage (e-Office / SAP / Tools)",
+      "rating": null,
+      "short_remark": null,
+      "weightage_percent": 15,
+      "score": null
+    },
+    {
+      "sl_no": 7,
+      "competency": "Drafting Skills",
+      "rating": null,
+      "short_remark": null,
+      "weightage_percent": 10,
+      "score": null
+    }
+  ],
+  "total_score": null
+}
+

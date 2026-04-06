@@ -1,0 +1,170 @@
+Forms JSON
+
+{
+  "forms": [
+    {
+      "formName": "Form A - Basic Information",
+      "section": "Section I",
+      "ownerRole": "Employee",
+      "fields": [
+        {"fieldName": "name", "type": "text", "source": "auto"},
+        {"fieldName": "employeeId", "type": "text", "source": "auto"},
+        {"fieldName": "cadreWing", "type": "text"},
+        {"fieldName": "designation", "type": "text"},
+        {"fieldName": "posting", "type": "text"},
+        {"fieldName": "reportingHierarchy", "type": "text", "source": "auto"}
+      ]
+    },
+    {
+      "formName": "Form B - KRA/KPI Planning",
+      "section": "Section II Part 1",
+      "ownerRole": "Employee",
+      "fields": [
+        {"fieldName": "kraTitle", "type": "text"},
+        {"fieldName": "weightPercentage", "type": "number"},
+        {"fieldName": "annualTarget", "type": "text"},
+        {"fieldName": "sourceReference", "type": "text", "required": true},
+        {"fieldName": "status", "type": "enum", "values": ["draft", "submitted"]}
+      ]
+    },
+    {
+      "formName": "Form C - Mid-Year Review",
+      "ownerRole": "Employee/RO",
+      "fields": [
+        {"fieldName": "progressUpdate", "type": "text"},
+        {"fieldName": "kraRevisionRequest", "type": "boolean"},
+        {"fieldName": "revisionReason", "type": "text"}
+      ]
+    },
+    {
+      "formName": "Form D - Year-End Self Entry",
+      "section": "Section II Part 2",
+      "ownerRole": "Employee",
+      "fields": [
+        {"fieldName": "kraId", "type": "reference"},
+        {"fieldName": "actualAchievement", "type": "text"},
+        {"fieldName": "supportingDocument", "type": "file"}
+      ]
+    },
+    {
+      "formName": "Form E - Training and Development Needs",
+      "section": "Section VI",
+      "ownerRole": "Employee",
+      "fields": [
+        {"fieldName": "trainingTitle", "type": "text"},
+        {"fieldName": "trainingDescription", "type": "text"},
+        {"fieldName": "priorityLevel", "type": "enum", "values": ["high", "medium", "low"]}
+      ]
+    },
+    {
+      "formName": "Form F - Representation",
+      "ownerRole": "Employee",
+      "fields": [
+        {"fieldName": "representationText", "type": "text"},
+        {"fieldName": "supportingDocument", "type": "file"},
+        {"fieldName": "submissionDate", "type": "date"}
+      ]
+    },
+    {
+      "formName": "Form G - KRA Approval",
+      "ownerRole": "Reporting Officer",
+      "fields": [
+        {"fieldName": "kraId", "type": "reference"},
+        {"fieldName": "approvedWeight", "type": "number"},
+        {"fieldName": "approvedTarget", "type": "text"},
+        {"fieldName": "approvalStatus", "type": "enum", "values": ["approved", "returned"]},
+        {"fieldName": "remarks", "type": "text"}
+      ]
+    },
+    {
+      "formName": "Form H - Evaluation and Rating",
+      "ownerRole": "Reporting Officer",
+      "fields": [
+        {"fieldName": "kraRating", "type": "number", "range": "1-10"},
+        {"fieldName": "personalAttributesRating", "type": "number", "range": "1-10"},
+        {"fieldName": "functionalCompetencyRating", "type": "number", "range": "1-10"},
+        {"fieldName": "mandatoryRemarks", "type": "text"}
+      ]
+    },
+    {
+      "formName": "Form I - Overall Summary",
+      "section": "Section IV",
+      "ownerRole": "Reporting Officer",
+      "fields": [
+        {"fieldName": "keyOutcomes", "type": "text"},
+        {"fieldName": "strengths", "type": "text"},
+        {"fieldName": "improvementAreas", "type": "text"},
+        {"fieldName": "overallAssessment", "type": "text"}
+      ]
+    },
+    {
+      "formName": "Form J - Integrity and Vigilance",
+      "section": "Section V",
+      "ownerRole": "Reporting Officer",
+      "fields": [
+        {"fieldName": "integrityCertificate", "type": "boolean"},
+        {"fieldName": "remarks", "type": "text"},
+        {"fieldName": "sealedCoverFlag", "type": "boolean"}
+      ]
+    },
+    {
+      "formName": "Form K - Review and Moderation",
+      "ownerRole": "Reviewing Officer",
+      "fields": [
+        {"fieldName": "roRatingsView", "type": "reference"},
+        {"fieldName": "revisedRating", "type": "number"},
+        {"fieldName": "deviationReason", "type": "text"},
+        {"fieldName": "forwardStatus", "type": "enum", "values": ["forwardedToAA"]}
+      ]
+    },
+    {
+      "formName": "Form L - Final Approval",
+      "ownerRole": "Accepting Authority",
+      "fields": [
+        {"fieldName": "finalRating", "type": "number"},
+        {"fieldName": "modificationReason", "type": "text"},
+        {"fieldName": "finalLock", "type": "boolean"}
+      ]
+    },
+    {
+      "formName": "Form M - Disclosure",
+      "ownerRole": "HRD/APAR Cell",
+      "fields": [
+        {"fieldName": "employeeId", "type": "reference"},
+        {"fieldName": "disclosureDate", "type": "date"},
+        {"fieldName": "status", "type": "enum", "values": ["released"]}
+      ]
+    },
+    {
+      "formName": "Form N - Representation Disposal",
+      "ownerRole": "HRD/APAR Cell",
+      "fields": [
+        {"fieldName": "representationId", "type": "reference"},
+        {"fieldName": "decision", "type": "enum", "values": ["accepted", "rejected", "modified"]},
+        {"fieldName": "decisionRemarks", "type": "text"},
+        {"fieldName": "closureDate", "type": "date"}
+      ]
+    },
+    {
+      "formName": "Form O - Administration",
+      "ownerRole": "HRD/APAR Cell",
+      "fields": [
+        {"fieldName": "authorityMatrixConfig", "type": "json"},
+        {"fieldName": "timelineConfig", "type": "json"},
+        {"fieldName": "deputationUpload", "type": "file"},
+        {"fieldName": "userMapping", "type": "json"}
+      ]
+    },
+    {
+      "formName": "Form P - Score Analytics Dashboard",
+      "ownerRole": "Moderation Committee",
+      "fields": [
+        {"fieldName": "gradeDistribution", "type": "chartData"},
+        {"fieldName": "wingComparison", "type": "chartData"},
+        {"fieldName": "outstandingPercentage", "type": "number"},
+        {"fieldName": "advisoryRemarks", "type": "text"}
+      ]
+    }
+  ]
+}
+
