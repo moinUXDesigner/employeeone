@@ -2,11 +2,19 @@ import { useState } from 'react';
 import { Award, TrendingUp, ArrowLeft, Calendar, FileText, MessageSquare, Check, Star, BookOpen, LayoutGrid, List, Clock } from 'lucide-react';
 import { useNavigate } from 'react-router';
 
+import platinumMedal from '../../images/Platinum-Enanced.png';
+import goldMedal from '../../images/Gold_Badge.png';
+import silverMedal from '../../images/Silver_Badge.png';
+import bronzeMedal from '../../images/Bronze_badge.png';
+
 // Medal image URLs - trying alternative format
-const platinumMedal = 'https://lh3.googleusercontent.com/d/1bwqTnvgL9cBnTbDwQIfxsa_Sj4vyzWfs';
-const goldMedal = 'https://lh3.googleusercontent.com/d/1aux4YIMvh5vmvdAxT_C1AFToRjuD8VFf';
-const silverMedal = 'https://lh3.googleusercontent.com/d/1UxKqpr3-svDOMy40FiwObJyQVCIzSvVr';
-const bronzeMedal = 'https://lh3.googleusercontent.com/d/1Syofn0zawFQf8bPyZnMHyROiSWkNumey';
+// const platinumMedal = 'https://lh3.googleusercontent.com/d/1bwqTnvgL9cBnTbDwQIfxsa_Sj4vyzWfs';
+// const goldMedal = 'https://lh3.googleusercontent.com/d/1aux4YIMvh5vmvdAxT_C1AFToRjuD8VFf';
+// const silverMedal = 'https://lh3.googleusercontent.com/d/1UxKqpr3-svDOMy40FiwObJyQVCIzSvVr';
+// const bronzeMedal = 'https://lh3.googleusercontent.com/d/1Syofn0zawFQf8bPyZnMHyROiSWkNumey';
+
+// Add images from src/app/images forlder
+
 
 const FinalScore = () => {
   const [selectedYear, setSelectedYear] = useState<string | null>(null);
