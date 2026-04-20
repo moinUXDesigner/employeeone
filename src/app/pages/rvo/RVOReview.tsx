@@ -783,12 +783,32 @@ const RVOReview = () => {
                     : "0",
               }}
             >
-              <div className="px-4 lg:px-8 pt-2 pb-3">
+              <div className="px-4 lg:px-8 py-3">
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <h2 className="text-base font-bold text-gray-900">
+                      Section II - KRA Rating
+                    </h2>
+                    <p className="text-xs text-gray-600 mt-0.5">
+                      Review RO ratings in a table and open the eye view when you need full context.
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                      Selected KRA
+                    </div>
+                    <div className="mt-1 text-sm font-semibold text-blue-700">
+                      {currentKRA.code}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="hidden px-4 lg:px-8 pt-2 pb-3">
                 {/* Mobile: Title + Arrow Navigation */}
                 <div className="md:hidden flex items-center justify-between mb-3">
                   <div>
                     <h2 className="text-base font-bold text-gray-900">
-                      Section II – KRA Rating
+                      Section II - KRA Rating
                     </h2>
                     <p className="text-xs text-gray-600 mt-0.5">
                       Review RO's ratings
@@ -830,7 +850,7 @@ const RVOReview = () => {
                 <div className="hidden md:flex items-center justify-between gap-6">
                   <div className="flex-shrink-0">
                     <h2 className="text-base font-bold text-gray-900">
-                      Section II – KRA Rating
+                      Section II - KRA Rating
                     </h2>
                     <p className="text-xs text-gray-600 mt-0.5">
                       Review RO's ratings
@@ -1017,7 +1037,7 @@ const RVOReview = () => {
                       Rating (1-10)
                     </label>
                     <div className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg bg-gray-50 text-gray-900 font-semibold">
-                      {currentKRA.ro.rating || "—"}
+                      {currentKRA.ro.rating || "-"}
                     </div>
                   </div>
 
@@ -1027,7 +1047,7 @@ const RVOReview = () => {
                       Weightage (%)
                     </label>
                     <div className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg bg-gray-50 text-gray-900 font-semibold">
-                      {currentKRA.ro.weightagePercent || "—"}
+                      {currentKRA.ro.weightagePercent || "-"}
                     </div>
                   </div>
 
@@ -1037,7 +1057,7 @@ const RVOReview = () => {
                       Score
                     </label>
                     <div className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg bg-blue-50 text-blue-600 font-semibold">
-                      {currentKRA.ro.score || "—"}
+                      {currentKRA.ro.score || "-"}
                     </div>
                   </div>
                 </div>
@@ -1126,7 +1146,7 @@ const RVOReview = () => {
                           Weightage (%)
                         </label>
                         <div className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg bg-gray-50 text-gray-900 font-semibold">
-                          {currentKRA.ro.weightagePercent || "—"}
+                          {currentKRA.ro.weightagePercent || "-"}
                         </div>
                       </div>
 
@@ -1136,7 +1156,7 @@ const RVOReview = () => {
                           Revised Score
                         </label>
                         <div className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg bg-amber-100 text-amber-700 font-semibold">
-                          {currentKRA.rvo.score || "—"}
+                          {currentKRA.rvo.score || "-"}
                         </div>
                       </div>
                     </div>

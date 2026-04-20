@@ -4,20 +4,26 @@ import {
   Send,
   ArrowLeft,
   CheckCircle,
+  Eye,
   X,
   ChevronLeft,
   ChevronRight,
   Check,
-  ChevronDown,
-  ChevronUp,
   Plus,
   Trash2,
   Edit,
 } from "lucide-react";
 import { useParams, Link, useNavigate } from "react-router";
 import { toast } from "sonner";
-import KRACard from "../../components/KRACard";
 import React from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "../../components/ui/dialog";
 
 const Evaluation = () => {
   const { employeeId } = useParams();
@@ -33,7 +39,8 @@ const Evaluation = () => {
     useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] =
     useState(false);
-  const [showSourceDetails, setShowSourceDetails] = useState(false);
+  const [isKraDialogOpen, setIsKraDialogOpen] =
+    useState(false);
 
   // Get user role from localStorage
   const userRole =
@@ -307,13 +314,16 @@ const Evaluation = () => {
         { name: "Customer_Feedback_Report_Q1.pdf", url: "#" },
         { name: "Response_Time_Analysis.xlsx", url: "#" },
       ],
+      employeeNotes:
+        "Excellent customer service delivery throughout the year.",
       status: "Approved" as const,
       type: "initial" as const,
       ro: {
-        rating: "",
+        rating: "9",
         weightagePercent: "25",
-        score: "",
-        validationNotes: "",
+        score: "22.50",
+        validationNotes:
+          "Excellent customer service delivery throughout the year.",
       },
       rvo: {
         rating: "",
@@ -328,24 +338,25 @@ const Evaluation = () => {
       id: "2",
       sl: "2",
       code: "KRA-002",
-      kpi: "Process Improvement - Identify and implement process improvements to enhance operational efficiency",
+      kpi: "Operational Efficiency Improvement - Enhance system efficiency and reduce downtime",
       targetAnnual:
-        "Implement 3 process improvements with cost savings of INR 50,000",
+        "Implement measurable process improvements with reduced downtime and improved turnaround time",
       actualAchievement:
-        "Implemented 4 improvements with total cost savings of INR 65,000",
-      sourceRefNo: "PI-2026-002",
+        "Delivered process changes that improved efficiency and reduced average downtime across key workflows",
+      sourceRefNo: "OE-2026-002",
       uploadedFiles: [
-        { name: "Process_Improvement_Report.pdf", url: "#" },
-        { name: "Cost_Savings_Analysis.xlsx", url: "#" },
-        { name: "Implementation_Timeline.pdf", url: "#" },
+        { name: "Operational_Efficiency_Report.pdf", url: "#" },
       ],
-      status: "Pending" as const,
+      employeeNotes:
+        "Consistently identified and closed operational bottlenecks.",
+      status: "Approved" as const,
       type: "initial" as const,
       ro: {
-        rating: "",
-        weightagePercent: "20",
-        score: "",
-        validationNotes: "",
+        rating: "8",
+        weightagePercent: "15",
+        score: "12.00",
+        validationNotes:
+          "Strong contribution to process optimization and workflow stability.",
       },
       rvo: {
         rating: "",
@@ -360,22 +371,178 @@ const Evaluation = () => {
       id: "3",
       sl: "3",
       code: "KRA-003",
-      kpi: "Team Collaboration - Foster effective collaboration within the team and across departments",
+      kpi: "Project Delivery & Timely Completion - Ensure timely completion of all assigned projects",
       targetAnnual:
-        "Participate in 2 cross-functional projects with team satisfaction score of 4.0+",
+        "Deliver assigned projects within timelines while maintaining delivery quality and stakeholder alignment",
       actualAchievement:
-        "Participated in 3 projects with team satisfaction score of 4.3",
-      sourceRefNo: "TC-2026-003",
-      uploadedFiles: [
-        { name: "Team_Feedback_Survey.pdf", url: "#" },
-      ],
+        "Completed most project milestones on time with only limited schedule variance on complex items",
+      sourceRefNo: "PD-2026-003",
+      uploadedFiles: [{ name: "Project_Delivery_Tracker.xlsx", url: "#" }],
+      employeeNotes:
+        "Handled multiple deadlines with dependable execution.",
       status: "Approved" as const,
-      type: "revised" as const,
+      type: "initial" as const,
       ro: {
-        rating: "",
+        rating: "7",
         weightagePercent: "15",
+        score: "10.50",
+        validationNotes:
+          "Delivery was reliable, with room to improve on stretch timelines.",
+      },
+      rvo: {
+        rating: "",
+        weightagePercent: "",
         score: "",
         validationNotes: "",
+      },
+      aa: "",
+      aaValidationNotes: "",
+    },
+    {
+      id: "4",
+      sl: "4",
+      code: "KRA-004",
+      kpi: "Cost Optimization & Budget Control - Achieve cost savings and effective budget utilization",
+      targetAnnual:
+        "Optimize allocated budgets and achieve measurable savings without impacting service quality",
+      actualAchievement:
+        "Improved cost discipline and contributed to budget efficiency through better planning and monitoring",
+      sourceRefNo: "CB-2026-004",
+      uploadedFiles: [{ name: "Budget_Control_Summary.pdf", url: "#" }],
+      employeeNotes:
+        "Demonstrated good cost awareness and spending discipline.",
+      status: "Approved" as const,
+      type: "initial" as const,
+      ro: {
+        rating: "8",
+        weightagePercent: "10",
+        score: "8.00",
+        validationNotes:
+          "Managed budget utilization effectively with visible cost control outcomes.",
+      },
+      rvo: {
+        rating: "",
+        weightagePercent: "",
+        score: "",
+        validationNotes: "",
+      },
+      aa: "",
+      aaValidationNotes: "",
+    },
+    {
+      id: "5",
+      sl: "5",
+      code: "KRA-005",
+      kpi: "Team Development & Capacity Building - Build team capabilities and technical expertise",
+      targetAnnual:
+        "Strengthen team capability through mentoring, coaching, and knowledge transfer",
+      actualAchievement:
+        "Actively supported teammates with guidance, task clarity, and capability uplift during delivery cycles",
+      sourceRefNo: "TD-2026-005",
+      uploadedFiles: [{ name: "Team_Capability_Notes.pdf", url: "#" }],
+      employeeNotes:
+        "Provided strong support to the team and encouraged skill development.",
+      status: "Approved" as const,
+      type: "initial" as const,
+      ro: {
+        rating: "9",
+        weightagePercent: "10",
+        score: "9.00",
+        validationNotes:
+          "Showed strong ownership in mentoring and building team effectiveness.",
+      },
+      rvo: {
+        rating: "",
+        weightagePercent: "",
+        score: "",
+        validationNotes: "",
+      },
+      aa: "",
+      aaValidationNotes: "",
+    },
+    {
+      id: "6",
+      sl: "6",
+      code: "KRA-006",
+      kpi: "Compliance & Governance - Ensure adherence to policies, regulations and safety standards",
+      targetAnnual:
+        "Maintain compliance with organizational standards, audit requirements, and governance controls",
+      actualAchievement:
+        "Followed compliance processes consistently and supported documentation discipline across activities",
+      sourceRefNo: "CG-2026-006",
+      uploadedFiles: [{ name: "Compliance_Checklist.pdf", url: "#" }],
+      employeeNotes:
+        "Maintained process discipline and followed mandatory controls well.",
+      status: "Approved" as const,
+      type: "initial" as const,
+      ro: {
+        rating: "8",
+        weightagePercent: "10",
+        score: "8.00",
+        validationNotes:
+          "Reliable adherence to compliance expectations and governance processes.",
+      },
+      rvo: {
+        rating: "",
+        weightagePercent: "",
+        score: "",
+        validationNotes: "",
+      },
+      aa: "",
+      aaValidationNotes: "",
+    },
+    {
+      id: "7",
+      sl: "7",
+      code: "KRA-007",
+      kpi: "Digital Transformation Initiatives - Drive digital initiatives to improve business processes",
+      targetAnnual:
+        "Support digital adoption and contribute to process modernization through practical improvements",
+      actualAchievement:
+        "Contributed to digital workflows and process improvements that supported better turnaround and visibility",
+      sourceRefNo: "DT-2026-007",
+      uploadedFiles: [{ name: "Digital_Initiative_Log.xlsx", url: "#" }],
+      employeeNotes:
+        "Participated well in digital enablement activities and improvement work.",
+      status: "Approved" as const,
+      type: "initial" as const,
+      ro: {
+        rating: "7",
+        weightagePercent: "7.5",
+        score: "5.25",
+        validationNotes:
+          "Good contribution to digital initiatives, with scope for broader impact.",
+      },
+      rvo: {
+        rating: "",
+        weightagePercent: "",
+        score: "",
+        validationNotes: "",
+      },
+      aa: "",
+      aaValidationNotes: "",
+    },
+    {
+      id: "8",
+      sl: "8",
+      code: "KRA-008",
+      kpi: "Stakeholder Engagement & Reporting - Timely reporting and stakeholder communication",
+      targetAnnual:
+        "Provide timely updates, accurate reporting, and responsive communication to stakeholders",
+      actualAchievement:
+        "Maintained regular communication and reporting cadence with stakeholders across review periods",
+      sourceRefNo: "SE-2026-008",
+      uploadedFiles: [{ name: "Stakeholder_Update_Summary.pdf", url: "#" }],
+      employeeNotes:
+        "Communication and reporting quality remained dependable throughout the year.",
+      status: "Approved" as const,
+      type: "initial" as const,
+      ro: {
+        rating: "8",
+        weightagePercent: "7.5",
+        score: "6.00",
+        validationNotes:
+          "Clear and timely stakeholder communication with good reporting discipline.",
       },
       rvo: {
         rating: "",
@@ -563,16 +730,9 @@ const Evaluation = () => {
     navigate("/review/pending-approvals");
   };
 
-  const handlePrevKRA = () => {
-    if (currentKRAIndex > 0) {
-      setCurrentKRAIndex(currentKRAIndex - 1);
-    }
-  };
-
-  const handleNextKRA = () => {
-    if (currentKRAIndex < kras.length - 1) {
-      setCurrentKRAIndex(currentKRAIndex + 1);
-    }
+  const openKraDetails = (index: number) => {
+    setCurrentKRAIndex(index);
+    setIsKraDialogOpen(true);
   };
 
   const renderStepContent = () => {
@@ -638,13 +798,19 @@ const Evaluation = () => {
         );
 
       case 2:
-        // Step 2: KRA Rating - Full Width Redesign
+        // Step 2: KRA Rating - Strict table view
         const currentKRA = kras[currentKRAIndex];
+        const getKraParts = (kpi: string) => {
+          const [title, ...rest] = kpi.split(" - ");
+          return {
+            title,
+            description: rest.join(" - "),
+          };
+        };
 
         return (
           <div className="space-y-0 -mt-4">
-            {/* Fixed KRA Navigation Pills - Below Stepper */}
-            <div 
+            <div
               className="fixed top-[109px] sm:top-[120px] md:top-[190px] left-0 lg:left-64 right-0 z-[8] bg-white border-b border-gray-200 transition-all duration-300"
               style={{
                 left:
@@ -656,280 +822,276 @@ const Evaluation = () => {
                     : "0",
               }}
             >
-              <div className="px-4 lg:px-8 pt-2 pb-3">
-                {/* Mobile: Title + Arrow Navigation */}
-                <div className="md:hidden flex items-center justify-between mb-3">
+              <div className="px-4 lg:px-8 py-3">
+                <div className="flex items-start justify-between gap-4">
                   <div>
-                    <h2 className="text-base font-bold text-gray-900">Section II – KRA Rating</h2>
-                    <p className="text-xs text-gray-600 mt-0.5">Rate each KRA on a scale of 1-10</p>
+                    <h2 className="text-base font-bold text-gray-900">
+                      Section II - KRA Rating
+                    </h2>
+                    <p className="text-xs text-gray-600 mt-0.5">
+                      Review all KRAs. Click eye icon to view full details before rating.
+                    </p>
                   </div>
-                  
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={handlePrevKRA}
-                      disabled={currentKRAIndex === 0}
-                      className={`p-1.5 rounded-lg ${
-                        currentKRAIndex === 0
-                          ? 'text-gray-300 cursor-not-allowed'
-                          : 'text-blue-600 hover:bg-blue-50'
-                      }`}
-                    >
-                      <ChevronLeft className="w-5 h-5" />
-                    </button>
-                    
-                    <span className="text-xs text-gray-600">
-                      {currentKRAIndex + 1}/{kras.length}
-                    </span>
-                    
-                    <button
-                      onClick={handleNextKRA}
-                      disabled={currentKRAIndex === kras.length - 1}
-                      className={`p-1.5 rounded-lg ${
-                        currentKRAIndex === kras.length - 1
-                          ? 'text-gray-300 cursor-not-allowed'
-                          : 'text-blue-600 hover:bg-blue-50'
-                      }`}
-                    >
-                      <ChevronRight className="w-5 h-5" />
-                    </button>
-                  </div>
-                </div>
-                
-                {/* Desktop: Title + Horizontal Pills */}
-                <div className="hidden md:flex items-center justify-between gap-6">
-                  <div className="flex-shrink-0">
-                    <h2 className="text-base font-bold text-gray-900">Section II – KRA Rating</h2>
-                    <p className="text-xs text-gray-600 mt-0.5">Rate each KRA on a scale of 1-10</p>
-                  </div>
-                  
-                  <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
-                    {kras.map((kra, index) => (
-                      <button
-                        key={kra.id}
-                        onClick={() => setCurrentKRAIndex(index)}
-                        className={`flex-shrink-0 px-4 py-2 rounded-lg font-medium text-sm transition-all ${
-                          currentKRAIndex === index
-                            ? 'bg-blue-600 text-white shadow-sm'
-                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                        }`}
-                      >
-                        {kra.code}
-                        {kra.ro.rating && (
-                          <Check className="inline-block w-3.5 h-3.5 ml-1.5" />
-                        )}
-                      </button>
-                    ))}
+                  <div className="pt-1 text-sm font-semibold text-blue-600">
+                    Total KRAs: {kras.length}
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Main Content - Full Width, No Nested Cards */}
-            <div className="px-4 lg:px-8 pt-[140px] sm:pt-[150px] md:pt-[100px] pb-[220px] md:pb-[180px] space-y-6">
-              {/* KRA Details Section */}
-              <div className="space-y-4">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-bold bg-blue-100 text-blue-700">
-                        {currentKRA.code}
-                      </span>
-                      <span className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium ${
-                        currentKRA.type === 'initial' 
-                          ? 'bg-green-100 text-green-700' 
-                          : 'bg-amber-100 text-amber-700'
-                      }`}>
-                        {currentKRA.type === 'initial' ? 'Initial' : 'Revised'}
-                      </span>
-                    </div>
-                    
-                    <h3 className="text-sm font-bold text-gray-900 mb-3">KRA / KPI</h3>
-                    <p className="text-sm text-gray-700 leading-relaxed">
-                      {currentKRA.kpi}
-                    </p>
-                  </div>
-                  
-                  {currentKRA.status && (
-                    <span className={`ml-4 flex-shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium ${
-                      currentKRA.status === 'Approved'
-                        ? 'bg-green-100 text-green-700'
-                        : 'bg-gray-100 text-gray-700'
-                    }`}>
-                      {currentKRA.status === 'Approved' && <CheckCircle className="w-3.5 h-3.5" />}
-                      {currentKRA.status}
-                    </span>
-                  )}
-                </div>
+            <div className="px-4 lg:px-8 pt-[124px] sm:pt-[130px] md:pt-[112px] pb-[220px] md:pb-[180px] space-y-6">
+              <div className="overflow-hidden rounded-lg border border-gray-200 bg-white">
+                <div className="overflow-x-auto">
+                  <table className="w-full min-w-[980px] border-collapse">
+                    <thead>
+                      <tr className="bg-gray-50">
+                        <th
+                          rowSpan={2}
+                          className="border border-gray-200 px-3 py-4 text-center text-xs font-semibold text-gray-900"
+                        >
+                          #
+                        </th>
+                        <th
+                          rowSpan={2}
+                          className="border border-gray-200 px-4 py-4 text-center text-xs font-semibold text-gray-900"
+                        >
+                          KRA / KPI Title
+                        </th>
+                        <th
+                          colSpan={5}
+                          className="border border-gray-200 px-4 py-3 text-center text-xs font-semibold text-gray-900"
+                        >
+                          RO Evaluation
+                        </th>
+                      </tr>
+                      <tr className="bg-gray-50">
+                        <th className="border border-gray-200 px-4 py-3 text-center text-xs font-semibold text-gray-900">
+                          Rating (1-10) <span className="text-red-600">*</span>
+                        </th>
+                        <th className="border border-gray-200 px-4 py-3 text-center text-xs font-semibold text-gray-900">
+                          Weightage (%) <span className="text-red-600">*</span>
+                        </th>
+                        <th className="border border-gray-200 px-4 py-3 text-center text-xs font-semibold text-gray-900">
+                          Score
+                        </th>
+                        <th className="border border-gray-200 px-4 py-3 text-center text-xs font-semibold text-gray-900">
+                          Validation Notes
+                        </th>
+                        <th className="border border-gray-200 px-4 py-3 text-center text-xs font-semibold text-gray-900">
+                          Action
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {kras.map((kra, index) => {
+                        const { title, description } = getKraParts(kra.kpi);
 
-                <div className="h-px bg-gray-200"></div>
-
-                {/* Target & Achievement Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-semibold text-gray-600 uppercase tracking-wide mb-2">
-                      Target (Annual)
-                    </label>
-                    <p className="text-sm text-gray-900">
-                      {currentKRA.targetAnnual}
-                    </p>
-                  </div>
-                  
-                  <div>
-                    <label className="block text-xs font-semibold text-gray-600 uppercase tracking-wide mb-2">
-                      Actual Achievement
-                    </label>
-                    <p className="text-sm text-gray-900">
-                      {currentKRA.actualAchievement}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="h-px bg-gray-200"></div>
-
-                {/* Source Ref & Files */}
-                <div className="space-y-3">
-                  {/* Collapsible Header */}
-                  <button
-                    onClick={() => setShowSourceDetails(!showSourceDetails)}
-                    className="w-full flex items-center justify-between py-2 hover:bg-gray-50 rounded-lg transition-colors"
-                  >
-                    <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">
-                      Source & Attachments
-                    </span>
-                    {showSourceDetails ? (
-                      <ChevronUp className="w-4 h-4 text-gray-500" />
-                    ) : (
-                      <ChevronDown className="w-4 h-4 text-gray-500" />
-                    )}
-                  </button>
-
-                  {/* Collapsible Content */}
-                  {showSourceDetails && (
-                    <div className="space-y-3 pl-2">
-                      <div>
-                        <label className="block text-xs font-semibold text-gray-600 uppercase tracking-wide mb-2">
-                          Source Ref No.
-                        </label>
-                        <p className="text-sm text-gray-900 font-mono">
-                          {currentKRA.sourceRefNo}
-                        </p>
-                      </div>
-                      
-                      {currentKRA.uploadedFiles && currentKRA.uploadedFiles.length > 0 && (
-                        <div>
-                          <label className="block text-xs font-semibold text-gray-600 uppercase tracking-wide mb-2">
-                            Attached Files ({currentKRA.uploadedFiles.length})
-                          </label>
-                          <div className="flex flex-wrap gap-2">
-                            {currentKRA.uploadedFiles.map((file, idx) => (
-                              <a
-                                key={idx}
-                                href={file.url}
-                                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg text-xs font-medium hover:bg-blue-100 transition-colors"
+                        return (
+                          <tr key={kra.id} className="bg-white hover:bg-blue-50/40">
+                            <td className="border border-gray-200 px-3 py-4 text-center text-sm text-gray-700">
+                              {kra.sl}
+                            </td>
+                            <td className="border border-gray-200 px-4 py-4 align-top">
+                              <div className="space-y-1">
+                                <div className="text-sm font-semibold text-gray-900">
+                                  {title}
+                                </div>
+                                <div className="text-sm text-gray-600">
+                                  {description}
+                                </div>
+                              </div>
+                            </td>
+                            <td className="border border-gray-200 px-4 py-3 align-top">
+                              <select
+                                className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm focus:border-transparent focus:ring-2 focus:ring-blue-500"
+                                value={kra.ro.rating}
+                                onChange={(e) => {
+                                  const newKras = [...kras];
+                                  newKras[index].ro.rating = e.target.value;
+                                  newKras[index].ro.score = calculateKRAScore(
+                                    e.target.value,
+                                    newKras[index].ro.weightagePercent,
+                                  );
+                                  setKras(newKras);
+                                }}
                               >
-                                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
-                                </svg>
-                                {file.name}
-                              </a>
-                            ))}
+                                <option value="">Select</option>
+                                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
+                                  <option key={num} value={num}>
+                                    {num}
+                                  </option>
+                                ))}
+                              </select>
+                            </td>
+                            <td className="border border-gray-200 px-4 py-3 align-top">
+                              <input
+                                type="number"
+                                min="0"
+                                max="100"
+                                step="0.5"
+                                className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm focus:border-transparent focus:ring-2 focus:ring-blue-500"
+                                value={kra.ro.weightagePercent}
+                                onChange={(e) => {
+                                  const newKras = [...kras];
+                                  newKras[index].ro.weightagePercent =
+                                    e.target.value;
+                                  newKras[index].ro.score = calculateKRAScore(
+                                    newKras[index].ro.rating,
+                                    e.target.value,
+                                  );
+                                  setKras(newKras);
+                                }}
+                              />
+                            </td>
+                            <td className="border border-gray-200 px-4 py-3 text-center align-middle text-sm font-semibold text-blue-600">
+                              {kra.ro.score || "-"}
+                            </td>
+                            <td className="border border-gray-200 px-4 py-3 align-top">
+                              <textarea
+                                rows={2}
+                                className="w-full resize-none rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm focus:border-transparent focus:ring-2 focus:ring-blue-500"
+                                placeholder="Optional notes"
+                                value={kra.ro.validationNotes}
+                                onChange={(e) => {
+                                  const newKras = [...kras];
+                                  newKras[index].ro.validationNotes =
+                                    e.target.value;
+                                  setKras(newKras);
+                                }}
+                              />
+                            </td>
+                            <td className="border border-gray-200 px-4 py-3 text-center align-middle">
+                              <button
+                                type="button"
+                                onClick={() => openKraDetails(index)}
+                                className="inline-flex h-9 w-9 items-center justify-center rounded-full text-blue-600 transition-colors hover:bg-blue-50"
+                                aria-label={`View ${kra.code} details`}
+                              >
+                                <Eye className="h-4 w-4" />
+                              </button>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <Dialog
+                open={isKraDialogOpen}
+                onOpenChange={setIsKraDialogOpen}
+              >
+                <DialogContent className="max-w-[460px] gap-0 overflow-hidden p-0">
+                  <DialogHeader className="border-b border-gray-200 px-5 py-4">
+                    <DialogTitle className="text-base font-semibold text-gray-900">
+                      KRA / KPI Details
+                    </DialogTitle>
+                    <DialogDescription className="sr-only">
+                      Detailed KRA information
+                    </DialogDescription>
+                  </DialogHeader>
+
+                  <div className="max-h-[70vh] overflow-y-auto px-5 py-4">
+                    <div className="space-y-5">
+                      <section className="space-y-3">
+                        <h3 className="text-sm font-semibold text-blue-600">
+                          Basic Information
+                        </h3>
+                        <div className="space-y-3 text-sm">
+                          <div>
+                            <div className="mb-1 text-xs font-medium text-gray-500">
+                              KRA / KPI Title
+                            </div>
+                            <div className="font-medium text-gray-900">
+                              {getKraParts(currentKRA.kpi).title}
+                            </div>
+                          </div>
+                          <div>
+                            <div className="mb-1 text-xs font-medium text-gray-500">
+                              Description
+                            </div>
+                            <div className="text-gray-700">
+                              {getKraParts(currentKRA.kpi).description}
+                            </div>
+                          </div>
+                          <div>
+                            <div className="mb-1 text-xs font-medium text-gray-500">
+                              Target (Annual)
+                            </div>
+                            <div className="text-gray-700">
+                              {currentKRA.targetAnnual}
+                            </div>
+                          </div>
+                          <div>
+                            <div className="mb-1 text-xs font-medium text-gray-500">
+                              Actual Achievement
+                            </div>
+                            <div className="text-gray-700">
+                              {currentKRA.actualAchievement}
+                            </div>
                           </div>
                         </div>
-                      )}
+                      </section>
+
+                      <div className="h-px bg-gray-200" />
+
+                      <section className="space-y-3">
+                        <h3 className="text-sm font-semibold text-blue-600">
+                          Source & Attachments
+                        </h3>
+                        <div className="space-y-3 text-sm">
+                          <div>
+                            <div className="mb-1 text-xs font-medium text-gray-500">
+                              Source Reference No.
+                            </div>
+                            <div className="text-gray-700">
+                              {currentKRA.sourceRefNo}
+                            </div>
+                          </div>
+                          <div>
+                            <div className="mb-2 text-xs font-medium text-gray-500">
+                              Attachments ({currentKRA.uploadedFiles.length})
+                            </div>
+                            <div className="flex flex-wrap gap-2">
+                              {currentKRA.uploadedFiles.map((file, index) => (
+                                <a
+                                  key={index}
+                                  href={file.url}
+                                  className="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-600 transition-colors hover:bg-blue-100"
+                                >
+                                  {file.name}
+                                </a>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      </section>
+
+                      <div className="h-px bg-gray-200" />
+
+                      <section className="space-y-3">
+                        <h3 className="text-sm font-semibold text-blue-600">
+                          Employee Notes
+                        </h3>
+                        <p className="text-sm text-gray-700">
+                          {currentKRA.employeeNotes}
+                        </p>
+                      </section>
                     </div>
-                  )}
-                </div>
-              </div>
+                  </div>
 
-              <div className="h-px bg-gray-300"></div>
-
-              {/* RO Evaluation Section */}
-              <div className="space-y-4">
-                <h3 className="text-sm font-bold text-gray-900">RO Evaluation</h3>
-                
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {/* Rating */}
-                  <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-2">
-                      Rating (1-10) <span className="text-red-600">*</span>
-                    </label>
-                    <select
-                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
-                      value={currentKRA.ro.rating}
-                      onChange={(e) => {
-                        const newKras = [...kras];
-                        newKras[currentKRAIndex].ro.rating = e.target.value;
-                        newKras[currentKRAIndex].ro.score = calculateKRAScore(
-                          e.target.value,
-                          newKras[currentKRAIndex].ro.weightagePercent
-                        );
-                        setKras(newKras);
-                      }}
+                  <DialogFooter className="border-t border-gray-200 px-5 py-3">
+                    <button
+                      type="button"
+                      onClick={() => setIsKraDialogOpen(false)}
+                      className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
                     >
-                      <option value="">Select rating</option>
-                      {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
-                        <option key={num} value={num}>
-                          {num}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  {/* Weightage */}
-                  <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-2">
-                      Weightage (%) <span className="text-red-600">*</span>
-                    </label>
-                    <input
-                      type="number"
-                      min="0"
-                      max="100"
-                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
-                      placeholder="25"
-                      value={currentKRA.ro.weightagePercent}
-                      onChange={(e) => {
-                        const newKras = [...kras];
-                        newKras[currentKRAIndex].ro.weightagePercent = e.target.value;
-                        newKras[currentKRAIndex].ro.score = calculateKRAScore(
-                          newKras[currentKRAIndex].ro.rating,
-                          e.target.value
-                        );
-                        setKras(newKras);
-                      }}
-                    />
-                  </div>
-
-                  {/* Score (Auto-calculated) */}
-                  <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-2">
-                      Score
-                    </label>
-                    <div className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg bg-gray-50 text-blue-600 font-semibold">
-                      {currentKRA.ro.score || '—'}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="h-px bg-gray-200"></div>
-
-              {/* Validation Notes Section */}
-              <div className="space-y-2">
-                <label className="block text-xs font-medium text-gray-700">
-                  Validation Notes
-                </label>
-                <textarea
-                  rows={4}
-                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none bg-white"
-                  placeholder="Enter validation notes..."
-                  value={currentKRA.ro.validationNotes}
-                  onChange={(e) => {
-                    const newKras = [...kras];
-                    newKras[currentKRAIndex].ro.validationNotes = e.target.value;
-                    setKras(newKras);
-                  }}
-                />
-              </div>
+                      Close
+                    </button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
             </div>
           </div>
         );
@@ -1950,19 +2112,43 @@ const Evaluation = () => {
                 <div className="bg-white/95 backdrop-blur-sm rounded px-2 py-1">
                   <div className="text-[10px] text-gray-600 leading-tight">Avg Rating</div>
                   <div className="text-xs font-semibold text-gray-900 leading-tight">
-                    {(kras.reduce((sum, k) => sum + (parseFloat(k.ro.rating) || 0), 0) / kras.filter(k => k.ro.rating).length || 0).toFixed(1)}
+                    {(() => {
+                      const score = kras.reduce(
+                        (sum, k) => sum + (parseFloat(k.ro.score) || 0),
+                        0,
+                      );
+                      const weightage = kras.reduce(
+                        (sum, k) =>
+                          sum + (parseFloat(k.ro.weightagePercent) || 0),
+                        0,
+                      );
+                      return (weightage > 0
+                        ? (score / weightage) * 10
+                        : 0
+                      ).toFixed(2);
+                    })()}
                   </div>
                 </div>
                 <div className="bg-white/95 backdrop-blur-sm rounded px-2 py-1">
                   <div className="text-[10px] text-gray-600 leading-tight">Grade</div>
                   <div className="text-xs font-semibold text-gray-900 leading-tight">
                     {(() => {
-                      const total = kras.reduce((sum, k) => sum + (parseFloat(k.ro.score) || 0), 0);
-                      if (total >= 90) return 'Platinum';
-                      if (total >= 75) return 'Gold';
-                      if (total >= 60) return 'Silver';
-                      if (total >= 50) return 'Bronze';
-                      return '—';
+                      const score = kras.reduce(
+                        (sum, k) => sum + (parseFloat(k.ro.score) || 0),
+                        0,
+                      );
+                      const weightage = kras.reduce(
+                        (sum, k) =>
+                          sum + (parseFloat(k.ro.weightagePercent) || 0),
+                        0,
+                      );
+                      const avg =
+                        weightage > 0 ? (score / weightage) * 10 : 0;
+                      if (avg >= 8.5) return "A+";
+                      if (avg >= 8) return "A";
+                      if (avg >= 7) return "B";
+                      if (avg >= 6) return "C";
+                      return "D";
                     })()}
                   </div>
                 </div>
