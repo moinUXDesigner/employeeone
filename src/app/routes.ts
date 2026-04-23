@@ -12,6 +12,7 @@ import Representation from "./pages/employee/Representation";
 import TrainingDevelopment from "./pages/employee/TrainingDevelopment";
 import PendingApprovals from "./pages/ro/PendingApprovals";
 import RecentlyCompleted from "./pages/ro/RecentlyCompleted";
+import Evaluations from "./pages/ro/Evaluations";
 import Evaluation from "./pages/ro/Evaluation";
 import RVOReview from "./pages/rvo/RVOReview";
 import AAApproval from "./pages/aa/AAApproval";
@@ -43,6 +44,7 @@ export const router = createBrowserRouter([
       { path: "my-pms/training", Component: TrainingDevelopment },
       
       // RO Routes
+      { path: "review/evaluations", Component: Evaluations },
       { path: "review/pending-approvals", Component: PendingApprovals },
       { path: "review/recently-completed", Component: RecentlyCompleted },
       { path: "review/evaluation/:employeeId", Component: Evaluation },

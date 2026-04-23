@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 import {
   Save,
   Eye,
@@ -20,6 +20,8 @@ import { toast } from "sonner";
 
 interface KRA {
   id: string;
+  sl?: string;
+  code?: string;
   kpi: string;
   targetAnnual: string;
   actualAchievement: string;
@@ -29,10 +31,31 @@ interface KRA {
   startDate?: string;
   endDate?: string;
   trainingRequirements: string;
+  uploadedFiles?: Array<{ name: string; url: string }>;
+  status?: "Approved" | "Pending" | "Draft";
+  type?: "initial" | "revised";
+  ro?: {
+    rating: string;
+    weightagePercent: string;
+    score: string;
+    validationNotes: string;
+  };
+  rvo?: {
+    rating: string;
+    weightagePercent: string;
+    score: string;
+    validationNotes: string;
+  };
+  aa?: string;
+  aaValidationNotes?: string;
 }
+
+const EMPLOYEE_KRA_STORAGE_KEY = "employee_kras";
 
 const KRAEntry = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const editKRA = (location.state as { editKRA?: KRA } | null)?.editKRA;
   const [currentStep, setCurrentStep] = useState(1);
   const [showExamples, setShowExamples] = useState(false);
 
@@ -65,7 +88,9 @@ const KRAEntry = () => {
     : "lg:left-64";
 
   const [formData, setFormData] = useState<KRA>({
-    id: Date.now().toString(),
+    id: editKRA?.id || Date.now().toString(),
+    sl: editKRA?.sl || "",
+    code: editKRA?.code || "",
     kpi: "",
     targetAnnual: "",
     actualAchievement: "",
@@ -76,6 +101,35 @@ const KRAEntry = () => {
     endDate: "",
     trainingRequirements: "",
   });
+
+  useEffect(() => {
+    if (!editKRA) return;
+
+    setFormData({
+      id: editKRA.id,
+      sl: editKRA.sl || "",
+      code: editKRA.code || "",
+      kpi: editKRA.kpi || "",
+      targetAnnual: editKRA.targetAnnual || "",
+      actualAchievement: editKRA.actualAchievement || "",
+      sourceRefNo: editKRA.sourceRefNo || "",
+      sourceFiles:
+        editKRA.sourceFiles ||
+        editKRA.uploadedFiles?.map((file) => file.name) ||
+        [],
+      employeeNotes: editKRA.employeeNotes || "",
+      startDate: editKRA.startDate || "",
+      endDate: editKRA.endDate || "",
+      trainingRequirements: editKRA.trainingRequirements || "",
+      uploadedFiles: editKRA.uploadedFiles || [],
+      status: editKRA.status,
+      type: editKRA.type,
+      ro: editKRA.ro,
+      rvo: editKRA.rvo,
+      aa: editKRA.aa,
+      aaValidationNotes: editKRA.aaValidationNotes,
+    });
+  }, [editKRA]);
 
   const steps = [
     { number: 1, name: "Basic Info", icon: BookOpen },
@@ -183,13 +237,76 @@ const KRAEntry = () => {
       return;
     }
 
-    // Simulate saving to backend/local storage
-    toast.success("KRA/KPI saved successfully!");
+    const savedKras = localStorage.getItem(EMPLOYEE_KRA_STORAGE_KEY);
+    const existingKras: KRA[] = savedKras
+      ? JSON.parse(savedKras)
+      : [];
+    const isEditing = existingKras.some(
+      (item) => item.id === formData.id,
+    );
+
+    const uploadedFiles =
+      formData.sourceFiles?.map((fileName) => ({
+        name: fileName,
+        url: "#",
+      })) || [];
+
+    const kraToSave: KRA = {
+      ...formData,
+      sl:
+        formData.sl ||
+        String(
+          isEditing
+            ? existingKras.findIndex(
+                (item) => item.id === formData.id,
+              ) + 1
+            : existingKras.length + 1,
+        ),
+      code:
+        formData.code ||
+        `KRA-${String(existingKras.length + 1).padStart(3, "0")}`,
+      uploadedFiles,
+      status: formData.status || "Draft",
+      type: formData.type || "initial",
+      ro: formData.ro || {
+        rating: "",
+        weightagePercent: "",
+        score: "",
+        validationNotes: "",
+      },
+      rvo: formData.rvo || {
+        rating: "",
+        weightagePercent: "",
+        score: "",
+        validationNotes: "",
+      },
+      aa: formData.aa || "",
+      aaValidationNotes: formData.aaValidationNotes || "",
+    };
+
+    const updatedKras = isEditing
+      ? existingKras.map((item) =>
+          item.id === formData.id ? kraToSave : item,
+        )
+      : [...existingKras, kraToSave];
+
+    localStorage.setItem(
+      EMPLOYEE_KRA_STORAGE_KEY,
+      JSON.stringify(updatedKras),
+    );
+
+    toast.success(
+      isEditing
+        ? "KRA/KPI updated successfully!"
+        : "KRA/KPI saved successfully!",
+    );
 
     // Show info message
     setTimeout(() => {
       toast.info(
-        "Redirecting to View KRA/KPIs page where you can add more entries, sign and submit.",
+        isEditing
+          ? "Redirecting to View KRA/KPIs page with your updated entry."
+          : "Redirecting to View KRA/KPIs page where you can add more entries, sign and submit.",
         {
           duration: 5000,
         },
@@ -251,10 +368,12 @@ const KRAEntry = () => {
           {/* Title */}
           <div className="mb-4">
             <h1 className="text-xl font-semibold text-gray-900">
-              KRA Entry Wizard
+              {editKRA ? "Edit KRA Entry" : "KRA Entry Wizard"}
             </h1>
             <p className="text-sm text-gray-600 mt-1">
-              Add one KRA/KPI at a time for focused entry
+              {editKRA
+                ? "Update the existing KRA/KPI details with the pre-filled data"
+                : "Add one KRA/KPI at a time for focused entry"}
             </p>
           </div>
 

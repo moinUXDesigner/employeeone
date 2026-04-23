@@ -730,7 +730,7 @@ const Evaluation = () => {
     toast.success("Evaluation submitted successfully!");
     setShowConfirmation(false);
     // Navigate back or perform other actions
-    navigate("/review/pending-approvals");
+    navigate("/review/evaluations?tab=pending");
   };
 
   const openKraDetails = (index: number) => {
@@ -1847,7 +1847,7 @@ const Evaluation = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 sm:gap-3">
               <Link
-                to="/review/pending-approvals"
+                to="/review/evaluations?tab=pending"
                 className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
                 title="Back to Approvals"
               >

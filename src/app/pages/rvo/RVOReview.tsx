@@ -39,6 +39,7 @@ const RVOReview = () => {
   const [isKraDialogOpen, setIsKraDialogOpen] = useState(false);
 
   // RVO Specific: Revise Ratings Mode - Independent for each step
+  const [reviseKraMode, setReviseKraMode] = useState(false);
   const [reviseAttributesMode, setReviseAttributesMode] = useState(false);
   const [reviseCompetenciesMode, setReviseCompetenciesMode] = useState(false);
   const [reviseSummaryMode, setReviseSummaryMode] = useState(false);
@@ -309,15 +310,9 @@ const RVOReview = () => {
   const [attributeRatings, setAttributeRatings] = useState<{
     [key: number]: string;
   }>({});
-  const [attributeRemarks, setAttributeRemarks] = useState<{
-    [key: number]: string;
-  }>({});
 
   // RVO Attribute Ratings
   const [rvoAttributeRatings, setRvoAttributeRatings] = useState<{
-    [key: number]: string;
-  }>({});
-  const [rvoAttributeRemarks, setRvoAttributeRemarks] = useState<{
     [key: number]: string;
   }>({});
 
@@ -364,15 +359,9 @@ const RVOReview = () => {
   const [competencyRatings, setCompetencyRatings] = useState<{
     [key: number]: string;
   }>({});
-  const [competencyRemarks, setCompetencyRemarks] = useState<{
-    [key: number]: string;
-  }>({});
 
   // RVO Competency Ratings
   const [rvoCompetencyRatings, setRvoCompetencyRatings] = useState<{
-    [key: number]: string;
-  }>({});
-  const [rvoCompetencyRemarks, setRvoCompetencyRemarks] = useState<{
     [key: number]: string;
   }>({});
 
@@ -543,6 +532,11 @@ const RVOReview = () => {
       title: "Review",
       fullTitle: "RVO Review",
     },
+    {
+      number: 8,
+      title: "Finalize",
+      fullTitle: "Final Assessment",
+    },
   ];
 
   const validateStep = (step: number): boolean => {
@@ -576,6 +570,10 @@ const RVOReview = () => {
         // RVO Review validation
         return true;
 
+      case 8:
+        // Final Assessment validation
+        return true;
+
       default:
         return true;
     }
@@ -601,7 +599,7 @@ const RVOReview = () => {
         setCompletedSteps([...completedSteps, currentStep]);
       }
 
-      if (currentStep < 7) {
+      if (currentStep < 8) {
         setCurrentStep(currentStep + 1);
         toast.success("Progress saved");
         window.scrollTo({ top: 0, behavior: "smooth" });
@@ -639,7 +637,7 @@ const RVOReview = () => {
     toast.success("RVO Review submitted successfully!");
     setShowConfirmation(false);
     // Navigate back or perform other actions
-    navigate("/review/pending-approvals");
+    navigate("/review/evaluations?tab=pending");
   };
 
   const openKraDetails = (index: number) => {
@@ -659,12 +657,7 @@ const RVOReview = () => {
       7: "8",
       8: "9",
     };
-    const roAttributeRemarks: { [key: number]: string } = {
-      1: "High integrity",
-      8: "Always punctual",
-    };
     setAttributeRatings(roAttributeRatings);
-    setAttributeRemarks(roAttributeRemarks);
 
     // RO Competency ratings
     const roCompetencyRatings: { [key: number]: string } = {
@@ -676,11 +669,7 @@ const RVOReview = () => {
       6: "7",
       7: "7",
     };
-    const roCompetencyRemarks: { [key: number]: string } = {
-      5: "Excellent safety awareness",
-    };
     setCompetencyRatings(roCompetencyRatings);
-    setCompetencyRemarks(roCompetencyRemarks);
 
     // RO Summary
     setKeyOutcomes(
@@ -797,11 +786,24 @@ const RVOReview = () => {
                       Section II - KRA Rating
                     </h2>
                     <p className="text-xs text-gray-600 mt-0.5">
-                      Review RO ratings and provide RVO ratings in the same table.
+                      Review RO ratings first, then use revise mode to provide RVO ratings.
                     </p>
                   </div>
-                  <div className="pt-1 text-sm font-semibold text-blue-600">
-                    Total KRAs: {kras.length}
+                  <div className="flex items-center gap-3">
+                    <div className="pt-1 text-sm font-semibold text-blue-600">
+                      Total KRAs: {kras.length}
+                    </div>
+                    <button
+                      onClick={() => setReviseKraMode(!reviseKraMode)}
+                      className={
+                        reviseKraMode
+                          ? "text-sm text-amber-700 hover:text-amber-900 underline"
+                          : "flex items-center gap-2 rounded-lg bg-amber-600 px-4 py-2 font-medium text-white transition-colors hover:bg-amber-700"
+                      }
+                    >
+                      {!reviseKraMode && <RefreshCw className="w-4 h-4" />}
+                      {reviseKraMode ? "Cancel Revision" : "Revise Ratings"}
+                    </button>
                   </div>
                 </div>
               </div>
@@ -810,7 +812,11 @@ const RVOReview = () => {
             <div className="px-4 lg:px-8 pt-[124px] sm:pt-[130px] md:pt-[112px] pb-[220px] md:pb-[180px] space-y-6">
               <div className="overflow-hidden rounded-lg border border-gray-200 bg-white">
                 <div className="overflow-x-auto">
-                  <table className="w-full min-w-[1400px] border-collapse">
+                  <table
+                    className={`w-full border-collapse ${
+                      reviseKraMode ? "min-w-[1400px]" : "min-w-[980px]"
+                    }`}
+                  >
                     <thead>
                       <tr className="bg-gray-50">
                         <th
@@ -837,12 +843,14 @@ const RVOReview = () => {
                         >
                           RO Evaluation
                         </th>
-                        <th
-                          colSpan={3}
-                          className="border border-gray-200 bg-amber-50 px-4 py-3 text-center text-xs font-semibold text-amber-900"
-                        >
-                          RVO Evaluation
-                        </th>
+                        {reviseKraMode && (
+                          <th
+                            colSpan={3}
+                            className="border border-gray-200 bg-amber-50 px-4 py-3 text-center text-xs font-semibold text-amber-900"
+                          >
+                            RVO Evaluation
+                          </th>
+                        )}
                       </tr>
                       <tr className="bg-gray-50">
                         <th className="border border-gray-200 px-4 py-3 text-center text-xs font-semibold text-gray-900">
@@ -854,15 +862,19 @@ const RVOReview = () => {
                         <th className="border border-gray-200 px-4 py-3 text-center text-xs font-semibold text-gray-900">
                           Score
                         </th>
-                        <th className="border border-gray-200 bg-amber-50 px-4 py-3 text-center text-xs font-semibold text-amber-900">
-                          Rating (1-10)
-                        </th>
-                        <th className="border border-gray-200 bg-amber-50 px-4 py-3 text-center text-xs font-semibold text-amber-900">
-                          Weightage (%)
-                        </th>
-                        <th className="border border-gray-200 bg-amber-50 px-4 py-3 text-center text-xs font-semibold text-amber-900">
-                          Score
-                        </th>
+                        {reviseKraMode && (
+                          <>
+                            <th className="border border-gray-200 bg-amber-50 px-4 py-3 text-center text-xs font-semibold text-amber-900">
+                              Rating (1-10)
+                            </th>
+                            <th className="border border-gray-200 bg-amber-50 px-4 py-3 text-center text-xs font-semibold text-amber-900">
+                              Weightage (%)
+                            </th>
+                            <th className="border border-gray-200 bg-amber-50 px-4 py-3 text-center text-xs font-semibold text-amber-900">
+                              Score
+                            </th>
+                          </>
+                        )}
                       </tr>
                     </thead>
                     <tbody>
@@ -901,34 +913,60 @@ const RVOReview = () => {
                             <td className="border border-gray-200 px-4 py-3 text-center text-sm font-semibold text-blue-600">
                               {kra.ro.score || "-"}
                             </td>
-                            <td className="border border-gray-200 bg-amber-50/40 px-4 py-3">
-                              <select
-                                className="w-full rounded-lg border border-amber-200 bg-white px-3 py-2 text-sm focus:border-transparent focus:ring-2 focus:ring-amber-500"
-                                value={kra.rvo.rating}
-                                onChange={(e) => {
-                                  const newKras = [...kras];
-                                  newKras[index].rvo.rating = e.target.value;
-                                  newKras[index].rvo.score = calculateKRAScore(
-                                    e.target.value,
-                                    newKras[index].ro.weightagePercent,
-                                  );
-                                  setKras(newKras);
-                                }}
-                              >
-                                <option value="">Select</option>
-                                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
-                                  <option key={num} value={num}>
-                                    {num}
-                                  </option>
-                                ))}
-                              </select>
-                            </td>
-                            <td className="border border-gray-200 bg-amber-50/40 px-4 py-3 text-center text-sm font-semibold text-gray-700">
-                              {kra.ro.weightagePercent || "-"}
-                            </td>
-                            <td className="border border-gray-200 bg-amber-50/40 px-4 py-3 text-center text-sm font-semibold text-amber-700">
-                              {kra.rvo.score || "-"}
-                            </td>
+                            {reviseKraMode && (
+                              <>
+                                <td className="border border-gray-200 bg-amber-50/40 px-4 py-3">
+                                  <select
+                                    className="w-full rounded-lg border border-amber-200 bg-white px-3 py-2 text-sm focus:border-transparent focus:ring-2 focus:ring-amber-500"
+                                    value={kra.rvo.rating}
+                                    onChange={(e) => {
+                                      const newKras = [...kras];
+                                      newKras[index].rvo.rating =
+                                        e.target.value;
+                                      newKras[index].rvo.score =
+                                        calculateKRAScore(
+                                          e.target.value,
+                                          newKras[index].rvo.weightagePercent,
+                                        );
+                                      setKras(newKras);
+                                    }}
+                                  >
+                                    <option value="">Select</option>
+                                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(
+                                      (num) => (
+                                        <option key={num} value={num}>
+                                          {num}
+                                        </option>
+                                      ),
+                                    )}
+                                  </select>
+                                </td>
+                                <td className="border border-gray-200 bg-amber-50/40 px-4 py-3">
+                                  <input
+                                    type="number"
+                                    min="0"
+                                    max="100"
+                                    step="0.5"
+                                    className="w-full rounded-lg border border-amber-200 bg-white px-3 py-2 text-sm focus:border-transparent focus:ring-2 focus:ring-amber-500"
+                                    value={kra.rvo.weightagePercent}
+                                    onChange={(e) => {
+                                      const newKras = [...kras];
+                                      newKras[index].rvo.weightagePercent =
+                                        e.target.value;
+                                      newKras[index].rvo.score =
+                                        calculateKRAScore(
+                                          newKras[index].rvo.rating,
+                                          e.target.value,
+                                        );
+                                      setKras(newKras);
+                                    }}
+                                  />
+                                </td>
+                                <td className="border border-gray-200 bg-amber-50/40 px-4 py-3 text-center text-sm font-semibold text-amber-700">
+                                  {kra.rvo.score || "-"}
+                                </td>
+                              </>
+                            )}
                           </tr>
                         );
                       })}
@@ -1060,13 +1098,30 @@ const RVOReview = () => {
         return (
           <div className="space-y-6">
             <div className="bg-white rounded-lg border border-gray-200">
-              <div className="p-4 md:p-6 md:py-3 border-b border-gray-200">
-                <h2 className="font-semibold text-gray-900">
-                  Section III (A) - Personal Attributes
-                </h2>
-                <p className="text-sm text-gray-600 mt-1">
-                  Total Weightage: 100%
-                </p>
+              <div className="flex items-center justify-between gap-4 border-b border-gray-200 p-4 md:px-6 md:py-3">
+                <div>
+                  <h2 className="font-semibold text-gray-900">
+                    Section III (A) - Personal Attributes
+                  </h2>
+                  <p className="mt-1 text-sm text-gray-600">
+                    Total Weightage: 100%
+                  </p>
+                </div>
+                <button
+                  onClick={() =>
+                    setReviseAttributesMode(!reviseAttributesMode)
+                  }
+                  className={
+                    reviseAttributesMode
+                      ? "text-sm text-amber-700 hover:text-amber-900 underline"
+                      : "flex items-center gap-2 rounded-lg bg-amber-600 px-4 py-2 font-medium text-white transition-colors hover:bg-amber-700"
+                  }
+                >
+                  {!reviseAttributesMode && <RefreshCw className="w-4 h-4" />}
+                  {reviseAttributesMode
+                    ? "Cancel Revision"
+                    : "Revise Ratings"}
+                </button>
               </div>
               <div className="p-4 md:p-6">
                 <div className="overflow-x-auto">
@@ -1083,14 +1138,24 @@ const RVOReview = () => {
                           RO Rating
                         </th>
                         <th className="border border-gray-200 px-2 md:px-3 py-2 text-left text-xs md:text-sm font-semibold text-gray-900 bg-gray-50">
-                          RO Remark
-                        </th>
-                        <th className="border border-gray-200 px-2 md:px-3 py-2 text-left text-xs md:text-sm font-semibold text-gray-900 bg-gray-50">
                           Weightage (%)
                         </th>
                         <th className="border border-gray-200 px-2 md:px-3 py-2 text-left text-xs md:text-sm font-semibold text-gray-900 bg-gray-50">
                           Score
                         </th>
+                        {reviseAttributesMode && (
+                          <>
+                            <th className="border border-gray-200 px-2 md:px-3 py-2 text-left text-xs md:text-sm font-semibold text-amber-900 bg-amber-50">
+                              RVO Rating (1-10)
+                            </th>
+                            <th className="border border-gray-200 px-2 md:px-3 py-2 text-left text-xs md:text-sm font-semibold text-amber-900 bg-amber-50">
+                              Weightage (%)
+                            </th>
+                            <th className="border border-gray-200 px-2 md:px-3 py-2 text-left text-xs md:text-sm font-semibold text-amber-900 bg-amber-50">
+                              Score
+                            </th>
+                          </>
+                        )}
                       </tr>
                     </thead>
                     <tbody>
@@ -1110,11 +1175,6 @@ const RVOReview = () => {
                               {attributeRatings[attr.sl_no] || "—"}
                             </div>
                           </td>
-                          <td className="border border-gray-200 px-2 md:px-3 py-2">
-                            <div className="w-full px-2 md:px-3 py-1.5 text-xs md:text-sm border border-gray-300 rounded-lg bg-gray-50 text-gray-700">
-                              {attributeRemarks[attr.sl_no] || "—"}
-                            </div>
-                          </td>
                           <td className="border border-gray-200 px-2 md:px-3 py-2 text-xs md:text-sm text-gray-900 text-center font-medium">
                             {attr.weightage_percent}%
                           </td>
@@ -1124,11 +1184,40 @@ const RVOReview = () => {
                               attr.weightage_percent,
                             )}
                           </td>
+                          {reviseAttributesMode && (
+                            <>
+                              <td className="border border-gray-200 bg-amber-50/40 px-2 md:px-3 py-2">
+                                <input
+                                  type="number"
+                                  min="1"
+                                  max="10"
+                                  className="w-full px-2 md:px-3 py-1.5 text-xs md:text-sm border border-amber-200 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                                  placeholder="1-10"
+                                  value={rvoAttributeRatings[attr.sl_no] || ""}
+                                  onChange={(e) =>
+                                    setRvoAttributeRatings({
+                                      ...rvoAttributeRatings,
+                                      [attr.sl_no]: e.target.value,
+                                    })
+                                  }
+                                />
+                              </td>
+                              <td className="border border-gray-200 bg-amber-50/40 px-2 md:px-3 py-2 text-xs md:text-sm text-gray-900 text-center font-medium">
+                                {attr.weightage_percent}%
+                              </td>
+                              <td className="border border-gray-200 bg-amber-50/40 px-2 md:px-3 py-2 text-xs md:text-sm text-amber-600 font-semibold text-center">
+                                {calculateScore(
+                                  rvoAttributeRatings[attr.sl_no] || "",
+                                  attr.weightage_percent,
+                                )}
+                              </td>
+                            </>
+                          )}
                         </tr>
                       ))}
                       <tr className="bg-blue-50 font-semibold sticky bottom-0">
                         <td
-                          colSpan={5}
+                          colSpan={4}
                           className="border border-gray-200 px-2 md:px-3 py-2 text-xs md:text-sm text-gray-900 text-right bg-blue-50"
                         >
                           Total Score:
@@ -1139,6 +1228,20 @@ const RVOReview = () => {
                             personalAttributes,
                           )}
                         </td>
+                        {reviseAttributesMode && (
+                          <>
+                            <td className="border border-gray-200 px-2 md:px-3 py-2 bg-amber-100" />
+                            <td className="border border-gray-200 px-2 md:px-3 py-2 text-xs md:text-sm text-gray-900 text-center bg-amber-100 font-medium">
+                              100%
+                            </td>
+                            <td className="border border-gray-200 px-2 md:px-3 py-2 text-xs md:text-sm text-amber-700 font-bold text-center bg-amber-100">
+                              {calculateTotalScore(
+                                rvoAttributeRatings,
+                                personalAttributes,
+                              )}
+                            </td>
+                          </>
+                        )}
                       </tr>
                     </tbody>
                   </table>
@@ -1146,140 +1249,6 @@ const RVOReview = () => {
               </div>
             </div>
 
-            {/* Revise Ratings Button */}
-            {!reviseAttributesMode && (
-              <div className="flex justify-center">
-                <button
-                  onClick={() => setReviseAttributesMode(true)}
-                  className="flex items-center gap-2 px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 font-medium transition-colors"
-                >
-                  <RefreshCw className="w-4 h-4" />
-                  Revise Ratings
-                </button>
-              </div>
-            )}
-
-            {/* RVO Revision Table */}
-            {reviseAttributesMode && (
-              <div className="bg-white rounded-lg border border-amber-300">
-                <div className="p-4 md:p-6 md:py-3 border-b border-amber-200 bg-amber-50">
-                  <div className="flex items-center justify-between">
-                    <h2 className="font-semibold text-amber-900">
-                      RVO Revision - Personal Attributes
-                    </h2>
-                    <button
-                      onClick={() => setReviseAttributesMode(false)}
-                      className="text-xs text-amber-700 hover:text-amber-900 underline"
-                    >
-                      Cancel Revision
-                    </button>
-                  </div>
-                </div>
-                <div className="p-4 md:p-6">
-                  <div className="overflow-x-auto">
-                    <table className="w-full border-collapse">
-                      <thead className="sticky top-0 z-10">
-                        <tr className="bg-amber-50">
-                          <th className="border border-gray-200 px-2 md:px-3 py-2 text-left text-xs md:text-sm font-semibold text-gray-900 bg-amber-50">
-                            Sl. No.
-                          </th>
-                          <th className="border border-gray-200 px-2 md:px-3 py-2 text-left text-xs md:text-sm font-semibold text-gray-900 bg-amber-50">
-                            Attribute
-                          </th>
-                          <th className="border border-gray-200 px-2 md:px-3 py-2 text-left text-xs md:text-sm font-semibold text-gray-900 bg-amber-50">
-                            RVO Rating (1-10)
-                          </th>
-                          <th className="border border-gray-200 px-2 md:px-3 py-2 text-left text-xs md:text-sm font-semibold text-gray-900 bg-amber-50">
-                            RVO Remark
-                          </th>
-                          <th className="border border-gray-200 px-2 md:px-3 py-2 text-left text-xs md:text-sm font-semibold text-gray-900 bg-amber-50">
-                            Weightage (%)
-                          </th>
-                          <th className="border border-gray-200 px-2 md:px-3 py-2 text-left text-xs md:text-sm font-semibold text-gray-900 bg-amber-50">
-                            Score
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {personalAttributes.map((attr) => (
-                          <tr
-                            key={attr.sl_no}
-                            className="hover:bg-gray-50 bg-white"
-                          >
-                            <td className="border border-gray-200 px-2 md:px-3 py-2 text-xs md:text-sm text-gray-900">
-                              {attr.sl_no}
-                            </td>
-                            <td className="border border-gray-200 px-2 md:px-3 py-2 text-xs md:text-sm text-gray-900">
-                              {attr.attribute}
-                            </td>
-                            <td className="border border-gray-200 px-2 md:px-3 py-2">
-                              <input
-                                type="number"
-                                min="1"
-                                max="10"
-                                className="w-full px-2 md:px-3 py-1.5 text-xs md:text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-                                placeholder="1-10"
-                                value={
-                                  rvoAttributeRatings[attr.sl_no] ||
-                                  ""
-                                }
-                                onChange={(e) =>
-                                  setRvoAttributeRatings({
-                                    ...rvoAttributeRatings,
-                                    [attr.sl_no]: e.target.value,
-                                  })
-                                }
-                              />
-                            </td>
-                            <td className="border border-gray-200 px-2 md:px-3 py-2">
-                              <input
-                                type="text"
-                                className="w-full px-2 md:px-3 py-1.5 text-xs md:text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-                                placeholder="Enter remark..."
-                                value={
-                                  rvoAttributeRemarks[attr.sl_no] ||
-                                  ""
-                                }
-                                onChange={(e) =>
-                                  setRvoAttributeRemarks({
-                                    ...rvoAttributeRemarks,
-                                    [attr.sl_no]: e.target.value,
-                                  })
-                                }
-                              />
-                            </td>
-                            <td className="border border-gray-200 px-2 md:px-3 py-2 text-xs md:text-sm text-gray-900 text-center font-medium">
-                              {attr.weightage_percent}%
-                            </td>
-                            <td className="border border-gray-200 px-2 md:px-3 py-2 text-xs md:text-sm text-amber-600 font-semibold text-center">
-                              {calculateScore(
-                                rvoAttributeRatings[attr.sl_no] ||
-                                  "",
-                                attr.weightage_percent,
-                              )}
-                            </td>
-                          </tr>
-                        ))}
-                        <tr className="bg-amber-100 font-semibold sticky bottom-0">
-                          <td
-                            colSpan={5}
-                            className="border border-gray-200 px-2 md:px-3 py-2 text-xs md:text-sm text-gray-900 text-right bg-amber-100"
-                          >
-                            Total Score:
-                          </td>
-                          <td className="border border-gray-200 px-2 md:px-3 py-2 text-xs md:text-sm text-amber-700 font-bold text-center bg-amber-100">
-                            {calculateTotalScore(
-                              rvoAttributeRatings,
-                              personalAttributes,
-                            )}
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </div>
-            )}
           </div>
         );
 
@@ -1288,13 +1257,32 @@ const RVOReview = () => {
         return (
           <div className="space-y-6">
             <div className="bg-white rounded-lg border border-gray-200">
-              <div className="p-4 md:p-6 border-b border-gray-200">
-                <h2 className="font-semibold text-gray-900">
-                  Section III (B) - Functional Competencies
-                </h2>
-                <p className="text-sm text-gray-600 mt-1">
-                  Total Weightage: 100%
-                </p>
+              <div className="flex items-center justify-between gap-4 border-b border-gray-200 p-4 md:px-6 md:py-3">
+                <div>
+                  <h2 className="font-semibold text-gray-900">
+                    Section III (B) - Functional Competencies
+                  </h2>
+                  <p className="mt-1 text-sm text-gray-600">
+                    Total Weightage: 100%
+                  </p>
+                </div>
+                <button
+                  onClick={() =>
+                    setReviseCompetenciesMode(!reviseCompetenciesMode)
+                  }
+                  className={
+                    reviseCompetenciesMode
+                      ? "text-sm text-amber-700 hover:text-amber-900 underline"
+                      : "flex items-center gap-2 rounded-lg bg-amber-600 px-4 py-2 font-medium text-white transition-colors hover:bg-amber-700"
+                  }
+                >
+                  {!reviseCompetenciesMode && (
+                    <RefreshCw className="w-4 h-4" />
+                  )}
+                  {reviseCompetenciesMode
+                    ? "Cancel Revision"
+                    : "Revise Ratings"}
+                </button>
               </div>
               <div className="p-4 md:p-6">
                 <div className="overflow-x-auto">
@@ -1311,14 +1299,24 @@ const RVOReview = () => {
                           RO Rating
                         </th>
                         <th className="border border-gray-200 px-2 md:px-3 py-2 text-left text-xs md:text-sm font-semibold text-gray-900 bg-gray-50">
-                          RO Remark
-                        </th>
-                        <th className="border border-gray-200 px-2 md:px-3 py-2 text-left text-xs md:text-sm font-semibold text-gray-900 bg-gray-50">
                           Weightage (%)
                         </th>
                         <th className="border border-gray-200 px-2 md:px-3 py-2 text-left text-xs md:text-sm font-semibold text-gray-900 bg-gray-50">
                           Score
                         </th>
+                        {reviseCompetenciesMode && (
+                          <>
+                            <th className="border border-gray-200 px-2 md:px-3 py-2 text-left text-xs md:text-sm font-semibold text-amber-900 bg-amber-50">
+                              RVO Rating (1-10)
+                            </th>
+                            <th className="border border-gray-200 px-2 md:px-3 py-2 text-left text-xs md:text-sm font-semibold text-amber-900 bg-amber-50">
+                              Weightage (%)
+                            </th>
+                            <th className="border border-gray-200 px-2 md:px-3 py-2 text-left text-xs md:text-sm font-semibold text-amber-900 bg-amber-50">
+                              Score
+                            </th>
+                          </>
+                        )}
                       </tr>
                     </thead>
                     <tbody>
@@ -1338,11 +1336,6 @@ const RVOReview = () => {
                               {competencyRatings[comp.sl_no] || "—"}
                             </div>
                           </td>
-                          <td className="border border-gray-200 px-2 md:px-3 py-2">
-                            <div className="w-full px-2 md:px-3 py-1.5 text-xs md:text-sm border border-gray-300 rounded-lg bg-gray-50 text-gray-700">
-                              {competencyRemarks[comp.sl_no] || "—"}
-                            </div>
-                          </td>
                           <td className="border border-gray-200 px-2 md:px-3 py-2 text-xs md:text-sm text-gray-900 text-center font-medium">
                             {comp.weightage_percent}%
                           </td>
@@ -1352,11 +1345,45 @@ const RVOReview = () => {
                               comp.weightage_percent,
                             )}
                           </td>
+                          {reviseCompetenciesMode && (
+                            <>
+                              <td className="border border-gray-200 bg-amber-50/40 px-2 md:px-3 py-2">
+                                <select
+                                  className="w-full px-2 md:px-3 py-1.5 text-xs md:text-sm border border-amber-200 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                                  value={rvoCompetencyRatings[comp.sl_no] || ""}
+                                  onChange={(e) =>
+                                    setRvoCompetencyRatings({
+                                      ...rvoCompetencyRatings,
+                                      [comp.sl_no]: e.target.value,
+                                    })
+                                  }
+                                >
+                                  <option value="">Select</option>
+                                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(
+                                    (num) => (
+                                      <option key={num} value={num}>
+                                        {num}
+                                      </option>
+                                    ),
+                                  )}
+                                </select>
+                              </td>
+                              <td className="border border-gray-200 bg-amber-50/40 px-2 md:px-3 py-2 text-xs md:text-sm text-gray-900 text-center font-medium">
+                                {comp.weightage_percent}%
+                              </td>
+                              <td className="border border-gray-200 bg-amber-50/40 px-2 md:px-3 py-2 text-xs md:text-sm text-amber-600 font-semibold text-center">
+                                {calculateScore(
+                                  rvoCompetencyRatings[comp.sl_no] || "",
+                                  comp.weightage_percent,
+                                )}
+                              </td>
+                            </>
+                          )}
                         </tr>
                       ))}
                       <tr className="bg-blue-50 font-semibold sticky bottom-0">
                         <td
-                          colSpan={5}
+                          colSpan={4}
                           className="border border-gray-200 px-2 md:px-3 py-2 text-xs md:text-sm text-gray-900 text-right bg-blue-50"
                         >
                           Total Score:
@@ -1367,164 +1394,50 @@ const RVOReview = () => {
                             functionalCompetencies,
                           )}
                         </td>
+                        {reviseCompetenciesMode && (
+                          <>
+                            <td className="border border-gray-200 px-2 md:px-3 py-2 bg-amber-100" />
+                            <td className="border border-gray-200 px-2 md:px-3 py-2 text-xs md:text-sm text-gray-900 text-center bg-amber-100 font-medium">
+                              100%
+                            </td>
+                            <td className="border border-gray-200 px-2 md:px-3 py-2 text-xs md:text-sm text-amber-700 font-bold text-center bg-amber-100">
+                              {calculateTotalScore(
+                                rvoCompetencyRatings,
+                                functionalCompetencies,
+                              )}
+                            </td>
+                          </>
+                        )}
                       </tr>
                     </tbody>
                   </table>
                 </div>
               </div>
             </div>
-
-            {/* Revise Ratings Button */}
-            {!reviseCompetenciesMode && (
-              <div className="flex justify-center">
-                <button
-                  onClick={() => setReviseCompetenciesMode(true)}
-                  className="flex items-center gap-2 px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 font-medium transition-colors"
-                >
-                  <RefreshCw className="w-4 h-4" />
-                  Revise Ratings
-                </button>
-              </div>
-            )}
-
-            {/* RVO Revision Table */}
-            {reviseCompetenciesMode && (
-              <div className="bg-white rounded-lg border border-amber-300">
-                <div className="p-4 md:p-6 md:py-3 border-b border-amber-200 bg-amber-50">
-                  <div className="flex items-center justify-between">
-                    <h2 className="font-semibold text-amber-900">
-                      RVO Revision - Functional Competencies
-                    </h2>
-                    <button
-                      onClick={() => setReviseCompetenciesMode(false)}
-                      className="text-xs text-amber-700 hover:text-amber-900 underline"
-                    >
-                      Cancel Revision
-                    </button>
-                  </div>
-                </div>
-                <div className="p-4 md:p-6">
-                  <div className="overflow-x-auto">
-                    <table className="w-full border-collapse">
-                      <thead className="sticky top-0 z-10">
-                        <tr className="bg-amber-50">
-                          <th className="border border-gray-200 px-2 md:px-3 py-2 text-left text-xs md:text-sm font-semibold text-gray-900 bg-amber-50">
-                            Sl. No.
-                          </th>
-                          <th className="border border-gray-200 px-2 md:px-3 py-2 text-left text-xs md:text-sm font-semibold text-gray-900 bg-amber-50">
-                            Competency
-                          </th>
-                          <th className="border border-gray-200 px-2 md:px-3 py-2 text-left text-xs md:text-sm font-semibold text-gray-900 bg-amber-50">
-                            RVO Rating (1-10)
-                          </th>
-                          <th className="border border-gray-200 px-2 md:px-3 py-2 text-left text-xs md:text-sm font-semibold text-gray-900 bg-amber-50">
-                            RVO Remark
-                          </th>
-                          <th className="border border-gray-200 px-2 md:px-3 py-2 text-left text-xs md:text-sm font-semibold text-gray-900 bg-amber-50">
-                            Weightage (%)
-                          </th>
-                          <th className="border border-gray-200 px-2 md:px-3 py-2 text-left text-xs md:text-sm font-semibold text-gray-900 bg-amber-50">
-                            Score
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {functionalCompetencies.map((comp) => (
-                          <tr
-                            key={comp.sl_no}
-                            className="hover:bg-gray-50 bg-white"
-                          >
-                            <td className="border border-gray-200 px-2 md:px-3 py-2 text-xs md:text-sm text-gray-900">
-                              {comp.sl_no}
-                            </td>
-                            <td className="border border-gray-200 px-2 md:px-3 py-2 text-xs md:text-sm text-gray-900">
-                              {comp.competency}
-                            </td>
-                            <td className="border border-gray-200 px-2 md:px-3 py-2">
-                              <select
-                                className="w-full px-2 md:px-3 py-1.5 text-xs md:text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-                                value={
-                                  rvoCompetencyRatings[comp.sl_no] ||
-                                  ""
-                                }
-                                onChange={(e) =>
-                                  setRvoCompetencyRatings({
-                                    ...rvoCompetencyRatings,
-                                    [comp.sl_no]: e.target.value,
-                                  })
-                                }
-                              >
-                                <option value="">Select</option>
-                                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(
-                                  (num) => (
-                                    <option key={num} value={num}>
-                                      {num}
-                                    </option>
-                                  ),
-                                )}
-                              </select>
-                            </td>
-                            <td className="border border-gray-200 px-2 md:px-3 py-2">
-                              <input
-                                type="text"
-                                className="w-full px-2 md:px-3 py-1.5 text-xs md:text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-                                placeholder="Enter remark..."
-                                value={
-                                  rvoCompetencyRemarks[comp.sl_no] ||
-                                  ""
-                                }
-                                onChange={(e) =>
-                                  setRvoCompetencyRemarks({
-                                    ...rvoCompetencyRemarks,
-                                    [comp.sl_no]: e.target.value,
-                                  })
-                                }
-                              />
-                            </td>
-                            <td className="border border-gray-200 px-2 md:px-3 py-2 text-xs md:text-sm text-gray-900 text-center font-medium">
-                              {comp.weightage_percent}%
-                            </td>
-                            <td className="border border-gray-200 px-2 md:px-3 py-2 text-xs md:text-sm text-amber-600 font-semibold text-center">
-                              {calculateScore(
-                                rvoCompetencyRatings[comp.sl_no] ||
-                                  "",
-                                comp.weightage_percent,
-                              )}
-                            </td>
-                          </tr>
-                        ))}
-                        <tr className="bg-amber-100 font-semibold sticky bottom-0">
-                          <td
-                            colSpan={5}
-                            className="border border-gray-200 px-2 md:px-3 py-2 text-xs md:text-sm text-gray-900 text-right bg-amber-100"
-                          >
-                            Total Score:
-                          </td>
-                          <td className="border border-gray-200 px-2 md:px-3 py-2 text-xs md:text-sm text-amber-700 font-bold text-center bg-amber-100">
-                            {calculateTotalScore(
-                              rvoCompetencyRatings,
-                              functionalCompetencies,
-                            )}
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </div>
-            )}
           </div>
         );
-
       case 5:
         // Step 5: Overall Summary (RO's - Read Only)
         return (
           <div className="space-y-6">
             <div className="bg-white rounded-lg border border-gray-200">
-              <div className="p-4 md:p-6 border-b border-gray-200">
+              <div className="flex items-center justify-between gap-4 border-b border-gray-200 p-4 md:px-6 md:py-3">
                 <h2 className="font-semibold text-gray-900">
                   Section IV - Overall Summary (RO's Assessment)
                 </h2>
+                <button
+                  onClick={() => setReviseSummaryMode(!reviseSummaryMode)}
+                  className={
+                    reviseSummaryMode
+                      ? "text-sm text-amber-700 hover:text-amber-900 underline"
+                      : "flex items-center gap-2 rounded-lg bg-amber-600 px-4 py-2 font-medium text-white transition-colors hover:bg-amber-700"
+                  }
+                >
+                  {!reviseSummaryMode && <RefreshCw className="w-4 h-4" />}
+                  {reviseSummaryMode
+                    ? "Cancel Revision"
+                    : "Revise Summary"}
+                </button>
               </div>
               <div className="p-3 md:p-4 md:pb-10">
                 <div className="space-y-3">
@@ -1576,34 +1489,13 @@ const RVOReview = () => {
               </div>
             </div>
 
-            {/* Revise Summary Button */}
-            {!reviseSummaryMode && (
-              <div className="flex justify-center">
-                <button
-                  onClick={() => setReviseSummaryMode(true)}
-                  className="flex items-center gap-2 px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 font-medium transition-colors"
-                >
-                  <RefreshCw className="w-4 h-4" />
-                  Revise Summary
-                </button>
-              </div>
-            )}
-
             {/* RVO Revision Summary */}
             {reviseSummaryMode && (
               <div className="bg-white rounded-lg border border-amber-300">
-                <div className="p-4 md:p-6 md:py-3 border-b border-amber-200 bg-amber-50">
-                  <div className="flex items-center justify-between">
-                    <h2 className="font-semibold text-amber-900">
-                      RVO's Revised Summary
-                    </h2>
-                    <button
-                      onClick={() => setReviseSummaryMode(false)}
-                      className="text-xs text-amber-700 hover:text-amber-900 underline"
-                    >
-                      Cancel Revision
-                    </button>
-                  </div>
+                <div className="border-b border-amber-200 bg-amber-50 p-4 md:px-6 md:py-3">
+                  <h2 className="font-semibold text-amber-900">
+                    RVO's Revised Summary
+                  </h2>
                 </div>
                 <div className="p-3 md:p-4 md:pb-10">
                   <div className="space-y-3">
@@ -1694,15 +1586,28 @@ const RVOReview = () => {
         return (
           <div className="space-y-6">
             <div className="bg-white rounded-lg border border-gray-200">
-              <div className="p-4 md:p-6 border-b border-gray-200">
+              <div className="flex items-center justify-between gap-4 border-b border-gray-200 p-4 md:px-6 md:py-3">
                 <div>
                   <h2 className="font-semibold text-gray-900">
                     Section VI - Training Needs (RO's Identification)
                   </h2>
-                  <p className="text-sm text-gray-600 mt-1">
+                  <p className="mt-1 text-sm text-gray-600">
                     Training programs identified by RO
                   </p>
                 </div>
+                <button
+                  onClick={() => setReviseTrainingMode(!reviseTrainingMode)}
+                  className={
+                    reviseTrainingMode
+                      ? "text-sm text-amber-700 hover:text-amber-900 underline"
+                      : "flex items-center gap-2 rounded-lg bg-amber-600 px-4 py-2 font-medium text-white transition-colors hover:bg-amber-700"
+                  }
+                >
+                  {!reviseTrainingMode && <RefreshCw className="w-4 h-4" />}
+                  {reviseTrainingMode
+                    ? "Cancel Revision"
+                    : "Revise Training Needs"}
+                </button>
               </div>
 
               <div className="p-3 md:p-4">
@@ -1771,19 +1676,6 @@ const RVOReview = () => {
               </div>
             </div>
 
-            {/* Revise Training Button */}
-            {!reviseTrainingMode && (
-              <div className="flex justify-center">
-                <button
-                  onClick={() => setReviseTrainingMode(true)}
-                  className="flex items-center gap-2 px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 font-medium transition-colors"
-                >
-                  <RefreshCw className="w-4 h-4" />
-                  Revise Training Needs
-                </button>
-              </div>
-            )}
-
             {/* RVO Revision Training */}
             {reviseTrainingMode && (
               <div className="bg-white rounded-lg border border-amber-300">
@@ -1806,12 +1698,6 @@ const RVOReview = () => {
                         Add Training
                       </button>
                     )}
-                    <button
-                      onClick={() => setReviseTrainingMode(false)}
-                      className="text-xs text-amber-700 hover:text-amber-900 underline"
-                    >
-                      Cancel Revision
-                    </button>
                   </div>
                 </div>
 
@@ -1983,7 +1869,7 @@ const RVOReview = () => {
         );
 
       case 7:
-        // Step 7: RVO Review & Final Submission
+        // Step 7: RVO Review
         return (
           <div className="space-y-6">
             {/* Review Summary */}
@@ -2121,7 +2007,7 @@ const RVOReview = () => {
                   </div>
 
                   {/* Warning */}
-                  <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 mb-24">
+                  <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 mb-28 md:mb-32">
                     <p className="text-sm text-orange-900">
                       <strong>Important:</strong> Once submitted, this
                       RVO review cannot be edited. Please ensure all
@@ -2132,7 +2018,13 @@ const RVOReview = () => {
               </div>
             </div>
 
-            {/* RVO's Final Remarks */}
+          </div>
+        );
+
+      case 8:
+        // Step 8: Final Assessment
+        return (
+          <div className="space-y-6">
             <div className="bg-white rounded-lg border border-gray-200">
               <div className="p-4 md:p-6 border-b border-gray-200">
                 <h2 className="font-semibold text-gray-900">
@@ -2197,7 +2089,7 @@ const RVOReview = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 sm:gap-3">
               <Link
-                to="/review/pending-approvals"
+                to="/review/evaluations?tab=pending"
                 className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
                 title="Back to Approvals"
               >
@@ -2311,7 +2203,7 @@ const RVOReview = () => {
         <div className="bg-white rounded-lg border border-gray-200 p-4">
           <div className="flex items-center justify-between mb-3">
             <span className="text-sm font-semibold text-gray-900">
-              Step {currentStep} of 7
+              Step {currentStep} of 8
             </span>
             <span className="text-sm text-gray-600">
               {steps[currentStep - 1].fullTitle}
@@ -2320,7 +2212,7 @@ const RVOReview = () => {
           <div className="w-full bg-gray-200 rounded-full h-2">
             <div
               className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-              style={{ width: `${(currentStep / 7) * 100}%` }}
+              style={{ width: `${(currentStep / 8) * 100}%` }}
             />
           </div>
         </div>
@@ -2367,7 +2259,7 @@ const RVOReview = () => {
             onClick={handleNext}
             className="flex items-center gap-1.5 px-4 py-1.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700"
           >
-            {currentStep === 7 ? (
+            {currentStep === 8 ? (
               <>
                 <Send className="w-3.5 h-3.5" />
                 Forward to AA
@@ -2409,7 +2301,7 @@ const RVOReview = () => {
             onClick={handleNext}
             className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
           >
-            {currentStep === 7 ? (
+            {currentStep === 8 ? (
               <>
                 <Send className="w-5 h-5" />
                 Submit
@@ -2443,14 +2335,16 @@ const RVOReview = () => {
               <div className="flex items-center gap-3">
                 <div>
                   <h4 className="text-xs font-semibold text-white leading-tight">
-                    Total Score Summary (RO)
+                    {reviseKraMode
+                      ? "Total Score Summary (RVO)"
+                      : "Total Score Summary (RO)"}
                   </h4>
                   <p className="text-[10px] text-blue-100 leading-tight">
-                    {
-                      kras.filter(
-                        (k) => k.ro.rating && k.ro.weightagePercent,
-                      ).length
-                    }{" "}
+                    {kras.filter((k) =>
+                      reviseKraMode
+                        ? k.rvo.rating && k.rvo.weightagePercent
+                        : k.ro.rating && k.ro.weightagePercent,
+                    ).length}{" "}
                     / {kras.length} KRAs
                   </p>
                 </div>
@@ -2458,7 +2352,11 @@ const RVOReview = () => {
                   <div className="text-lg font-bold text-white leading-tight">
                     {kras
                       .reduce(
-                        (sum, k) => sum + (parseFloat(k.ro.score) || 0),
+                        (sum, k) =>
+                          sum +
+                          (parseFloat(
+                            reviseKraMode ? k.rvo.score : k.ro.score,
+                          ) || 0),
                         0,
                       )
                       .toFixed(2)}
@@ -2477,7 +2375,12 @@ const RVOReview = () => {
                     {kras
                       .reduce(
                         (sum, k) =>
-                          sum + (parseFloat(k.ro.weightagePercent) || 0),
+                          sum +
+                          (parseFloat(
+                            reviseKraMode
+                              ? k.rvo.weightagePercent
+                              : k.ro.weightagePercent,
+                          ) || 0),
                         0,
                       )
                       .toFixed(0)}
@@ -2489,13 +2392,21 @@ const RVOReview = () => {
                     Avg Rating
                   </div>
                   <div className="text-xs font-semibold text-gray-900 leading-tight">
-                    {kras.filter((k) => k.ro.rating).length > 0
+                    {kras.filter((k) =>
+                      reviseKraMode ? k.rvo.rating : k.ro.rating,
+                    ).length > 0
                       ? (
                           kras.reduce(
                             (sum, k) =>
-                              sum + (parseFloat(k.ro.rating) || 0),
+                              sum +
+                              (parseFloat(
+                                reviseKraMode ? k.rvo.rating : k.ro.rating,
+                              ) || 0),
                             0,
-                          ) / kras.filter((k) => k.ro.rating).length
+                          ) /
+                          kras.filter((k) =>
+                            reviseKraMode ? k.rvo.rating : k.ro.rating,
+                          ).length
                         ).toFixed(1)
                       : "—"}
                   </div>

@@ -3,7 +3,6 @@ import { Outlet, Link, useLocation, useNavigate } from 'react-router';
 import { 
   LayoutDashboard, 
   FileEdit, 
-  CheckSquare, 
   BarChart3, 
   Settings, 
   Eye,
@@ -19,7 +18,7 @@ import {
   TrendingUp,
   MessageSquare,
   GraduationCap,
-  CheckCircle
+  ClipboardCheck
 } from 'lucide-react';
 import Logo from '../components/Logo';
 
@@ -140,8 +139,7 @@ const Root = () => {
     
     // RO Menu
     { name: 'Review & Approvals', type: 'section', roles: ['RO', 'RVO', 'AA'] },
-    { name: 'Pending Approvals', href: '/review/pending-approvals', icon: CheckSquare, roles: ['RO', 'RVO', 'AA'] },
-    { name: 'Recently Completed', href: '/review/recently-completed', icon: CheckCircle, roles: ['RO', 'RVO', 'AA'] },
+    { name: 'Evaluations', href: '/review/evaluations?tab=pending', icon: ClipboardCheck, roles: ['RO', 'RVO', 'AA'] },
     
     // HRD Menu
     { name: 'Analytics', href: '/analytics', icon: BarChart3, roles: ['HRD'] },

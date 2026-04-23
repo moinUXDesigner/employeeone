@@ -1,4 +1,4 @@
-import { CheckCircle, Clock, FileText, Download, Edit2, Save, ChevronDown, ChevronUp, X, Upload, RotateCcw } from 'lucide-react';
+import { CheckCircle, Clock, FileText, Download, Edit2, Save, ChevronDown, ChevronUp, X, Upload, RotateCcw, Eye, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
@@ -30,9 +30,12 @@ interface KRACardProps {
     aaValidationNotes?: string;
   };
   userRole: 'Employee' | 'RO' | 'RVO' | 'AA' | 'HRD';
+  onView?: () => void;
+  onEdit?: () => void;
+  onDelete?: () => void;
 }
 
-const KRACard = ({ kra, userRole }: KRACardProps) => {
+const KRACard = ({ kra, userRole, onView, onEdit, onDelete }: KRACardProps) => {
   const showROFields = ['RO', 'RVO', 'AA', 'HRD'].includes(userRole);
   const showRVOFields = ['RVO', 'AA', 'HRD'].includes(userRole);
   const showAAFields = ['AA', 'HRD'].includes(userRole);
@@ -151,14 +154,37 @@ const KRACard = ({ kra, userRole }: KRACardProps) => {
               </button>
             )
           )}
-          {canRevise && (
-            <button
-              className="flex items-center gap-1.5 px-3 py-1.5 border border-gray-300 text-gray-700 text-sm font-medium rounded hover:bg-gray-50 transition-colors"
-              onClick={() => setShowReviseModal(true)}
-            >
-              <RotateCcw className="w-4 h-4" />
-              Revise
-            </button>
+      {canRevise && (
+        <div className="flex items-center gap-2">
+          <button
+            className="flex items-center gap-1.5 px-3 py-1.5 border border-gray-300 text-gray-700 text-sm font-medium rounded hover:bg-gray-50 transition-colors"
+            onClick={onView}
+          >
+            <Eye className="w-4 h-4" />
+            View
+          </button>
+          <button
+            className="flex items-center gap-1.5 px-3 py-1.5 border border-gray-300 text-gray-700 text-sm font-medium rounded hover:bg-gray-50 transition-colors"
+            onClick={onEdit}
+          >
+            <Edit2 className="w-4 h-4" />
+            Edit
+          </button>
+          <button
+            className="flex items-center gap-1.5 px-3 py-1.5 border border-gray-300 text-red-600 text-sm font-medium rounded hover:bg-red-50 transition-colors"
+            onClick={onDelete}
+          >
+            <Trash2 className="w-4 h-4" />
+            Delete
+          </button>
+          <button
+            className="flex items-center gap-1.5 px-3 py-1.5 border border-gray-300 text-gray-700 text-sm font-medium rounded hover:bg-gray-50 transition-colors"
+            onClick={() => setShowReviseModal(true)}
+          >
+            <RotateCcw className="w-4 h-4" />
+            Revise
+          </button>
+        </div>
           )}
         </div>
       </div>

@@ -424,7 +424,7 @@ const AAApproval = () => {
       toast.success("AA appraisal finalized successfully!");
       setTimeout(() => {
         setShowSuccessMessage(false);
-        navigate("/review/pending-approvals");
+        navigate("/review/evaluations?tab=pending");
       }, 1500);
       return;
     }
@@ -1119,7 +1119,7 @@ const AAApproval = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 sm:gap-3">
               <Link
-                to="/review/pending-approvals"
+                to="/review/evaluations?tab=pending"
                 className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
                 title="Back to Approvals"
               >

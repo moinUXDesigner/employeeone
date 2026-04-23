@@ -1,19 +1,145 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
-import { LayoutGrid, List, Filter, Eye, Edit, CheckCircle, Clock, X, RotateCcw, Save, Upload, Download, PenTool, Shield, Plus } from 'lucide-react';
+import { LayoutGrid, List, Filter, Eye, Edit, CheckCircle, Clock, X, Trash2, Save, Upload, Download, PenTool, Shield, Plus } from 'lucide-react';
 import KRACard from '../../components/KRACard';
 import { toast } from 'sonner';
+
+const EMPLOYEE_KRA_STORAGE_KEY = 'employee_kras';
+
+type KRAItem = {
+  id: string;
+  sl: string;
+  code: string;
+  kpi: string;
+  targetAnnual: string;
+  actualAchievement: string;
+  sourceRefNo: string;
+  uploadedFiles: Array<{ name: string; url: string }>;
+  employeeNotes?: string;
+  trainingRequirements?: string;
+  status?: 'Approved' | 'Pending' | 'Draft';
+  type?: 'initial' | 'revised';
+  ro: {
+    rating: string;
+    weightagePercent: string;
+    score: string;
+    validationNotes: string;
+  };
+  rvo: {
+    rating: string;
+    weightagePercent: string;
+    score: string;
+    validationNotes: string;
+  };
+  aa: string;
+  aaValidationNotes: string;
+};
+
+const DEFAULT_KRAS: KRAItem[] = [
+  {
+    id: '1',
+    sl: '1',
+    code: 'KRA-001',
+    kpi: 'Customer Service Excellence - Maintain high standards of customer service and satisfaction',
+    targetAnnual: 'Customer satisfaction rating above 4.5/5 and response time within 24 hours',
+    actualAchievement: 'Achieved 4.7/5 rating with average response time of 18 hours',
+    sourceRefNo: 'CS-2026-001',
+    uploadedFiles: [
+      { name: 'Customer_Feedback_Report_Q1.pdf', url: '#' },
+      { name: 'Response_Time_Analysis.xlsx', url: '#' },
+    ],
+    employeeNotes: '',
+    trainingRequirements: '',
+    status: 'Approved',
+    type: 'initial',
+    ro: {
+      rating: '9',
+      weightagePercent: '25',
+      score: '2.25',
+      validationNotes: 'Excellent performance in customer service. Exceeded targets consistently.',
+    },
+    rvo: {
+      rating: '9',
+      weightagePercent: '25',
+      score: '2.25',
+      validationNotes: 'Outstanding achievement. Recommends for recognition.',
+    },
+    aa: 'Approved with commendation',
+    aaValidationNotes: 'Exemplary performance in customer service domain.',
+  },
+  {
+    id: '2',
+    sl: '2',
+    code: 'KRA-002',
+    kpi: 'Process Improvement - Identify and implement process improvements to enhance operational efficiency',
+    targetAnnual: 'Implement 3 process improvements with cost savings of INR 50,000',
+    actualAchievement: 'Implemented 4 improvements with total cost savings of INR 65,000',
+    sourceRefNo: 'PI-2026-002',
+    uploadedFiles: [
+      { name: 'Process_Improvement_Report.pdf', url: '#' },
+      { name: 'Cost_Savings_Analysis.xlsx', url: '#' },
+      { name: 'Implementation_Timeline.pdf', url: '#' },
+    ],
+    employeeNotes: '',
+    trainingRequirements: '',
+    status: 'Pending',
+    type: 'initial',
+    ro: {
+      rating: '8',
+      weightagePercent: '20',
+      score: '1.6',
+      validationNotes: 'Good performance. Exceeded the target number of improvements.',
+    },
+    rvo: {
+      rating: '8',
+      weightagePercent: '20',
+      score: '1.6',
+      validationNotes: 'Agrees with RO assessment. Good initiative shown.',
+    },
+    aa: '',
+    aaValidationNotes: '',
+  },
+  {
+    id: '3',
+    sl: '3',
+    code: 'KRA-003',
+    kpi: 'Team Collaboration - Foster effective collaboration within the team and across departments',
+    targetAnnual: 'Participate in 2 cross-functional projects with team satisfaction score of 4.0+',
+    actualAchievement: 'Participated in 3 projects with team satisfaction score of 4.3',
+    sourceRefNo: 'TC-2026-003',
+    uploadedFiles: [
+      { name: 'Team_Feedback_Survey.pdf', url: '#' },
+    ],
+    employeeNotes: '',
+    trainingRequirements: '',
+    status: 'Approved',
+    type: 'revised',
+    ro: {
+      rating: '8',
+      weightagePercent: '15',
+      score: '1.2',
+      validationNotes: 'Strong collaboration skills demonstrated.',
+    },
+    rvo: {
+      rating: '',
+      weightagePercent: '',
+      score: '',
+      validationNotes: '',
+    },
+    aa: '',
+    aaValidationNotes: '',
+  },
+];
 
 const ViewKRAs = () => {
   const navigate = useNavigate();
   const [viewMode, setViewMode] = useState<'card' | 'table'>('card');
   const [filterType, setFilterType] = useState<'all' | 'initial' | 'revised'>('all');
-  const [selectedKRA, setSelectedKRA] = useState<typeof kras[0] | null>(null);
-  const [reviseKRA, setReviseKRA] = useState<typeof kras[0] | null>(null);
+  const [kras, setKras] = useState<KRAItem[]>([]);
+  const [selectedKRA, setSelectedKRA] = useState<KRAItem | null>(null);
+  const [reviseKRA, setReviseKRA] = useState<KRAItem | null>(null);
   const [showSignModal, setShowSignModal] = useState(false);
   const [signMethod, setSignMethod] = useState<'dsc' | 'esign' | null>(null);
-
-  // Revise form state
   const [reviseKPI, setReviseKPI] = useState('');
   const [reviseTarget, setReviseTarget] = useState('');
   const [reviseAchievement, setReviseAchievement] = useState('');
@@ -22,108 +148,29 @@ const ViewKRAs = () => {
   // Always show employee-level view (no evaluation fields) in View KRAs page
   const userRole = 'Employee' as const;
 
-  const kras = [
-    {
-      id: '1',
-      sl: '1',
-      code: 'KRA-001',
-      kpi: 'Customer Service Excellence - Maintain high standards of customer service and satisfaction',
-      targetAnnual: 'Customer satisfaction rating above 4.5/5 and response time within 24 hours',
-      actualAchievement: 'Achieved 4.7/5 rating with average response time of 18 hours',
-      sourceRefNo: 'CS-2026-001',
-      uploadedFiles: [
-        { name: 'Customer_Feedback_Report_Q1.pdf', url: '#' },
-        { name: 'Response_Time_Analysis.xlsx', url: '#' },
-      ],
-      status: 'Approved' as const,
-      type: 'initial' as const,
-      ro: {
-        rating: '9',
-        weightagePercent: '25',
-        score: '2.25',
-        validationNotes: 'Excellent performance in customer service. Exceeded targets consistently.',
-      },
-      rvo: {
-        rating: '9',
-        weightagePercent: '25',
-        score: '2.25',
-        validationNotes: 'Outstanding achievement. Recommends for recognition.',
-      },
-      aa: 'Approved with commendation',
-      aaValidationNotes: 'Exemplary performance in customer service domain.',
-    },
-    {
-      id: '2',
-      sl: '2',
-      code: 'KRA-002',
-      kpi: 'Process Improvement - Identify and implement process improvements to enhance operational efficiency',
-      targetAnnual: 'Implement 3 process improvements with cost savings of INR 50,000',
-      actualAchievement: 'Implemented 4 improvements with total cost savings of INR 65,000',
-      sourceRefNo: 'PI-2026-002',
-      uploadedFiles: [
-        { name: 'Process_Improvement_Report.pdf', url: '#' },
-        { name: 'Cost_Savings_Analysis.xlsx', url: '#' },
-        { name: 'Implementation_Timeline.pdf', url: '#' },
-      ],
-      status: 'Pending' as const,
-      type: 'initial' as const,
-      ro: {
-        rating: '8',
-        weightagePercent: '20',
-        score: '1.6',
-        validationNotes: 'Good performance. Exceeded the target number of improvements.',
-      },
-      rvo: {
-        rating: '8',
-        weightagePercent: '20',
-        score: '1.6',
-        validationNotes: 'Agrees with RO assessment. Good initiative shown.',
-      },
-      aa: '',
-      aaValidationNotes: '',
-    },
-    {
-      id: '3',
-      sl: '3',
-      code: 'KRA-003',
-      kpi: 'Team Collaboration - Foster effective collaboration within the team and across departments',
-      targetAnnual: 'Participate in 2 cross-functional projects with team satisfaction score of 4.0+',
-      actualAchievement: 'Participated in 3 projects with team satisfaction score of 4.3',
-      sourceRefNo: 'TC-2026-003',
-      uploadedFiles: [
-        { name: 'Team_Feedback_Survey.pdf', url: '#' },
-      ],
-      status: 'Approved' as const,
-      type: 'revised' as const,
-      ro: {
-        rating: '8',
-        weightagePercent: '15',
-        score: '1.2',
-        validationNotes: 'Strong collaboration skills demonstrated.',
-      },
-      rvo: {
-        rating: '',
-        weightagePercent: '',
-        score: '',
-        validationNotes: '',
-      },
-      aa: '',
-      aaValidationNotes: '',
-    },
-  ];
+  useEffect(() => {
+    const savedKras = localStorage.getItem(EMPLOYEE_KRA_STORAGE_KEY);
+
+    if (savedKras) {
+      try {
+        setKras(JSON.parse(savedKras));
+        return;
+      } catch (error) {
+        console.error('Error loading employee KRAs:', error);
+      }
+    }
+
+    localStorage.setItem(
+      EMPLOYEE_KRA_STORAGE_KEY,
+      JSON.stringify(DEFAULT_KRAS),
+    );
+    setKras(DEFAULT_KRAS);
+  }, []);
 
   const filteredKRAs = kras.filter(kra => {
     if (filterType === 'all') return true;
     return kra.type === filterType;
   });
-
-  const handleReviseClick = (kra: typeof kras[0]) => {
-    setReviseKRA(kra);
-    setReviseKPI(kra.kpi);
-    setReviseTarget(kra.targetAnnual);
-    setReviseAchievement(kra.actualAchievement);
-    setReviseSourceRef(kra.sourceRefNo);
-  };
 
   const handleDownloadPDF = () => {
     toast.success('KRA/KPI document downloaded successfully!');
@@ -156,6 +203,34 @@ const ViewKRAs = () => {
 
   const handleAddNewKRA = () => {
     navigate('/my-pms/kra-entry');
+  };
+
+  const handleEditKRA = (kra: KRAItem) => {
+    navigate('/my-pms/kra-entry', {
+      state: { editKRA: kra },
+    });
+  };
+
+  const handleDeleteKRA = (kra: KRAItem) => {
+    const confirmed = window.confirm(
+      `Delete ${kra.code} from your KRA/KPI list?`,
+    );
+
+    if (!confirmed) return;
+
+    const updatedKras = kras
+      .filter((item) => item.id !== kra.id)
+      .map((item, index) => ({
+        ...item,
+        sl: String(index + 1),
+      }));
+
+    setKras(updatedKras);
+    localStorage.setItem(
+      EMPLOYEE_KRA_STORAGE_KEY,
+      JSON.stringify(updatedKras),
+    );
+    toast.success('KRA/KPI deleted successfully!');
   };
 
   return (
@@ -268,7 +343,15 @@ const ViewKRAs = () => {
       {viewMode === 'card' && (
         <div className="space-y-6 divide-y divide-gray-200 max-h-[calc(100vh-400px)] overflow-y-auto">
           {filteredKRAs.map((kra) => (
-            <KRACard key={kra.id} kra={kra} userRole={userRole} />
+            <div key={kra.id} className="pt-6 first:pt-0">
+              <KRACard 
+                kra={kra} 
+                userRole={userRole} 
+                onView={() => setSelectedKRA(kra)}
+                onEdit={() => handleEditKRA(kra)}
+                onDelete={() => handleDeleteKRA(kra)}
+              />
+            </div>
           ))}
         </div>
       )}
@@ -363,11 +446,18 @@ const ViewKRAs = () => {
                           View
                         </button>
                         <button 
-                          onClick={() => handleReviseClick(kra)}
-                          className="text-purple-600 hover:text-purple-700 text-sm font-medium inline-flex items-center gap-1"
+                          onClick={() => handleEditKRA(kra)}
+                          className="text-amber-600 hover:text-amber-700 text-sm font-medium inline-flex items-center gap-1"
                         >
-                          <RotateCcw className="w-4 h-4" />
-                          Revise
+                          <Edit className="w-4 h-4" />
+                          Edit
+                        </button>
+                        <button 
+                          onClick={() => handleDeleteKRA(kra)}
+                          className="text-red-600 hover:text-red-700 text-sm font-medium inline-flex items-center gap-1"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                          Delete
                         </button>
                       </div>
                     </td>
@@ -425,11 +515,18 @@ const ViewKRAs = () => {
                     View Details
                   </button>
                   <button 
-                    onClick={() => handleReviseClick(kra)}
-                    className="text-purple-600 hover:text-purple-700 text-sm font-medium inline-flex items-center gap-1"
+                    onClick={() => handleEditKRA(kra)}
+                    className="text-amber-600 hover:text-amber-700 text-sm font-medium inline-flex items-center gap-1"
                   >
-                    <RotateCcw className="w-4 h-4" />
-                    Revise
+                    <Edit className="w-4 h-4" />
+                    Edit
+                  </button>
+                  <button 
+                    onClick={() => handleDeleteKRA(kra)}
+                    className="text-red-600 hover:text-red-700 text-sm font-medium inline-flex items-center gap-1"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                    Delete
                   </button>
                 </div>
               </div>
