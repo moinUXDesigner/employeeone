@@ -90,6 +90,8 @@ const Evaluation = () => {
   }, [employeeId]);
 
   // Overall Summary fields
+  const [kraKpiValidationNotes, setKraKpiValidationNotes] =
+    useState("");
   const [keyOutcomes, setKeyOutcomes] = useState("");
   const [strengths, setStrengths] = useState("");
   const [areasForImprovement, setAreasForImprovement] =
@@ -641,6 +643,7 @@ const Evaluation = () => {
       case 5:
         // Overall Summary validation
         if (
+          !kraKpiValidationNotes ||
           !keyOutcomes ||
           !strengths ||
           !areasForImprovement ||
@@ -858,7 +861,7 @@ const Evaluation = () => {
                           KRA / KPI Title
                         </th>
                         <th
-                          colSpan={5}
+                          colSpan={4}
                           className="border border-gray-200 px-4 py-3 text-center text-xs font-semibold text-gray-900"
                         >
                           RO Evaluation
@@ -873,9 +876,6 @@ const Evaluation = () => {
                         </th>
                         <th className="border border-gray-200 px-4 py-3 text-center text-xs font-semibold text-gray-900">
                           Score
-                        </th>
-                        <th className="border border-gray-200 px-4 py-3 text-center text-xs font-semibold text-gray-900">
-                          Validation Notes
                         </th>
                         <th className="border border-gray-200 px-4 py-3 text-center text-xs font-semibold text-gray-900">
                           Action
@@ -945,20 +945,6 @@ const Evaluation = () => {
                             </td>
                             <td className="border border-gray-200 px-4 py-3 text-center align-middle text-sm font-semibold text-blue-600">
                               {kra.ro.score || "-"}
-                            </td>
-                            <td className="border border-gray-200 px-4 py-3 align-top">
-                              <textarea
-                                rows={2}
-                                className="w-full resize-none rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm focus:border-transparent focus:ring-2 focus:ring-blue-500"
-                                placeholder="Optional notes"
-                                value={kra.ro.validationNotes}
-                                onChange={(e) => {
-                                  const newKras = [...kras];
-                                  newKras[index].ro.validationNotes =
-                                    e.target.value;
-                                  setKras(newKras);
-                                }}
-                              />
                             </td>
                             <td className="border border-gray-200 px-4 py-3 text-center align-middle">
                               <button
@@ -1360,6 +1346,22 @@ const Evaluation = () => {
             </div>
             <div className="p-3 md:p-4 md:pb-10">
               <div className="space-y-3">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                    KRA/KPI Validation Notes{" "}
+                    <span className="text-red-600">*</span>
+                  </label>
+                  <textarea
+                    rows={2}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                    placeholder="Enter KRA/KPI validation notes..."
+                    value={kraKpiValidationNotes}
+                    onChange={(e) =>
+                      setKraKpiValidationNotes(e.target.value)
+                    }
+                  />
+                </div>
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1.5">
                     Key outcomes delivered{" "}
@@ -1768,7 +1770,8 @@ const Evaluation = () => {
                   {/* Overall Summary */}
                   <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
                     <h3 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
-                      {keyOutcomes &&
+                      {kraKpiValidationNotes &&
+                      keyOutcomes &&
                       strengths &&
                       areasForImprovement &&
                       overallAssessment ? (
@@ -1779,7 +1782,8 @@ const Evaluation = () => {
                       Overall Summary
                     </h3>
                     <p className="text-sm text-gray-600">
-                      {keyOutcomes &&
+                      {kraKpiValidationNotes &&
+                      keyOutcomes &&
                       strengths &&
                       areasForImprovement &&
                       overallAssessment
@@ -2229,6 +2233,15 @@ const Evaluation = () => {
                   Overall Summary
                 </h3>
                 <div className="space-y-4">
+                  <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                    <label className="block text-xs font-semibold text-gray-600 uppercase mb-2">
+                      KRA/KPI Validation Notes
+                    </label>
+                    <p className="text-sm text-gray-900 whitespace-pre-wrap">
+                      {kraKpiValidationNotes || "Not provided"}
+                    </p>
+                  </div>
+
                   <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
                     <label className="block text-xs font-semibold text-gray-600 uppercase mb-2">
                       Key Outcomes

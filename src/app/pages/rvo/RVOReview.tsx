@@ -4,12 +4,11 @@ import {
   Send,
   ArrowLeft,
   CheckCircle,
+  Eye,
   X,
   ChevronLeft,
   ChevronRight,
   Check,
-  ChevronDown,
-  ChevronUp,
   Plus,
   Trash2,
   Edit,
@@ -18,6 +17,14 @@ import {
 import { useParams, Link, useNavigate } from "react-router";
 import { toast } from "sonner";
 import React from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "../../components/ui/dialog";
 
 const RVOReview = () => {
   const { employeeId } = useParams();
@@ -29,10 +36,9 @@ const RVOReview = () => {
   const [sealedCover, setSealedCover] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [showSourceDetails, setShowSourceDetails] = useState(false);
+  const [isKraDialogOpen, setIsKraDialogOpen] = useState(false);
 
   // RVO Specific: Revise Ratings Mode - Independent for each step
-  const [reviseKRAMode, setReviseKRAMode] = useState(false);
   const [reviseAttributesMode, setReviseAttributesMode] = useState(false);
   const [reviseCompetenciesMode, setReviseCompetenciesMode] = useState(false);
   const [reviseSummaryMode, setReviseSummaryMode] = useState(false);
@@ -86,12 +92,14 @@ const RVOReview = () => {
   }, [employeeId]);
 
   // Overall Summary fields (RO's)
+  const [kraKpiValidationNotes, setKraKpiValidationNotes] = useState("");
   const [keyOutcomes, setKeyOutcomes] = useState("");
   const [strengths, setStrengths] = useState("");
   const [areasForImprovement, setAreasForImprovement] = useState("");
   const [overallAssessment, setOverallAssessment] = useState("");
 
   // RVO's Summary fields
+  const [rvoKraKpiValidationNotes, setRvoKraKpiValidationNotes] = useState("");
   const [rvoKeyOutcomes, setRvoKeyOutcomes] = useState("");
   const [rvoStrengths, setRvoStrengths] = useState("");
   const [rvoAreasForImprovement, setRvoAreasForImprovement] = useState("");
@@ -401,6 +409,14 @@ const RVOReview = () => {
     return ((parseFloat(rating) / 10) * parseFloat(weightage)).toFixed(2);
   };
 
+  const getKraParts = (kpi: string) => {
+    const [title, ...rest] = kpi.split(" - ");
+    return {
+      title,
+      description: rest.join(" - "),
+    };
+  };
+
   const [kras, setKras] = useState([
     {
       id: "1",
@@ -626,16 +642,9 @@ const RVOReview = () => {
     navigate("/review/pending-approvals");
   };
 
-  const handlePrevKRA = () => {
-    if (currentKRAIndex > 0) {
-      setCurrentKRAIndex(currentKRAIndex - 1);
-    }
-  };
-
-  const handleNextKRA = () => {
-    if (currentKRAIndex < kras.length - 1) {
-      setCurrentKRAIndex(currentKRAIndex + 1);
-    }
+  const openKraDetails = (index: number) => {
+    setCurrentKRAIndex(index);
+    setIsKraDialogOpen(true);
   };
 
   // Pre-populate RO ratings for attributes
@@ -765,12 +774,10 @@ const RVOReview = () => {
         );
 
       case 2:
-        // Step 2: KRA Rating - Full Width Redesign
+        // Step 2: KRA Rating - Table view with RO and RVO ratings
         const currentKRA = kras[currentKRAIndex];
-
         return (
           <div className="space-y-0 -mt-4">
-            {/* Fixed KRA Navigation Pills - Below Stepper */}
             <div
               className="fixed top-[109px] sm:top-[120px] md:top-[190px] left-0 lg:left-64 right-0 z-[8] bg-white border-b border-gray-200 transition-all duration-300"
               style={{
@@ -790,400 +797,260 @@ const RVOReview = () => {
                       Section II - KRA Rating
                     </h2>
                     <p className="text-xs text-gray-600 mt-0.5">
-                      Review RO ratings in a table and open the eye view when you need full context.
+                      Review RO ratings and provide RVO ratings in the same table.
                     </p>
                   </div>
-                  <div className="text-right">
-                    <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                      Selected KRA
-                    </div>
-                    <div className="mt-1 text-sm font-semibold text-blue-700">
-                      {currentKRA.code}
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="hidden px-4 lg:px-8 pt-2 pb-3">
-                {/* Mobile: Title + Arrow Navigation */}
-                <div className="md:hidden flex items-center justify-between mb-3">
-                  <div>
-                    <h2 className="text-base font-bold text-gray-900">
-                      Section II - KRA Rating
-                    </h2>
-                    <p className="text-xs text-gray-600 mt-0.5">
-                      Review RO's ratings
-                    </p>
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={handlePrevKRA}
-                      disabled={currentKRAIndex === 0}
-                      className={`p-1.5 rounded-lg ${
-                        currentKRAIndex === 0
-                          ? "text-gray-300 cursor-not-allowed"
-                          : "text-blue-600 hover:bg-blue-50"
-                      }`}
-                    >
-                      <ChevronLeft className="w-5 h-5" />
-                    </button>
-
-                    <span className="text-xs text-gray-600">
-                      {currentKRAIndex + 1}/{kras.length}
-                    </span>
-
-                    <button
-                      onClick={handleNextKRA}
-                      disabled={currentKRAIndex === kras.length - 1}
-                      className={`p-1.5 rounded-lg ${
-                        currentKRAIndex === kras.length - 1
-                          ? "text-gray-300 cursor-not-allowed"
-                          : "text-blue-600 hover:bg-blue-50"
-                      }`}
-                    >
-                      <ChevronRight className="w-5 h-5" />
-                    </button>
-                  </div>
-                </div>
-
-                {/* Desktop: Title + Horizontal Pills */}
-                <div className="hidden md:flex items-center justify-between gap-6">
-                  <div className="flex-shrink-0">
-                    <h2 className="text-base font-bold text-gray-900">
-                      Section II - KRA Rating
-                    </h2>
-                    <p className="text-xs text-gray-600 mt-0.5">
-                      Review RO's ratings
-                    </p>
-                  </div>
-
-                  <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
-                    {kras.map((kra, index) => (
-                      <button
-                        key={kra.id}
-                        onClick={() => setCurrentKRAIndex(index)}
-                        className={`flex-shrink-0 px-4 py-2 rounded-lg font-medium text-sm transition-all ${
-                          currentKRAIndex === index
-                            ? "bg-blue-600 text-white shadow-sm"
-                            : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                        }`}
-                      >
-                        {kra.code}
-                        {kra.ro.rating && (
-                          <Check className="inline-block w-3.5 h-3.5 ml-1.5" />
-                        )}
-                      </button>
-                    ))}
+                  <div className="pt-1 text-sm font-semibold text-blue-600">
+                    Total KRAs: {kras.length}
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Main Content - Full Width, No Nested Cards */}
-            <div className="px-4 lg:px-8 pt-[140px] sm:pt-[150px] md:pt-[100px] pb-[220px] md:pb-[180px] space-y-6">
-              {/* KRA Details Section */}
-              <div className="space-y-4">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-bold bg-blue-100 text-blue-700">
-                        {currentKRA.code}
-                      </span>
-                      <span
-                        className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium ${
-                          currentKRA.type === "initial"
-                            ? "bg-green-100 text-green-700"
-                            : "bg-amber-100 text-amber-700"
-                        }`}
-                      >
-                        {currentKRA.type === "initial"
-                          ? "Initial"
-                          : "Revised"}
-                      </span>
-                    </div>
+            <div className="px-4 lg:px-8 pt-[124px] sm:pt-[130px] md:pt-[112px] pb-[220px] md:pb-[180px] space-y-6">
+              <div className="overflow-hidden rounded-lg border border-gray-200 bg-white">
+                <div className="overflow-x-auto">
+                  <table className="w-full min-w-[1400px] border-collapse">
+                    <thead>
+                      <tr className="bg-gray-50">
+                        <th
+                          rowSpan={2}
+                          className="border border-gray-200 px-3 py-4 text-center text-xs font-semibold text-gray-900"
+                        >
+                          #
+                        </th>
+                        <th
+                          rowSpan={2}
+                          className="border border-gray-200 px-4 py-4 text-center text-xs font-semibold text-gray-900"
+                        >
+                          KRA / KPI Title
+                        </th>
+                        <th
+                          rowSpan={2}
+                          className="border border-gray-200 px-4 py-4 text-center text-xs font-semibold text-gray-900"
+                        >
+                          View
+                        </th>
+                        <th
+                          colSpan={3}
+                          className="border border-gray-200 px-4 py-3 text-center text-xs font-semibold text-gray-900"
+                        >
+                          RO Evaluation
+                        </th>
+                        <th
+                          colSpan={3}
+                          className="border border-gray-200 bg-amber-50 px-4 py-3 text-center text-xs font-semibold text-amber-900"
+                        >
+                          RVO Evaluation
+                        </th>
+                      </tr>
+                      <tr className="bg-gray-50">
+                        <th className="border border-gray-200 px-4 py-3 text-center text-xs font-semibold text-gray-900">
+                          Rating (1-10)
+                        </th>
+                        <th className="border border-gray-200 px-4 py-3 text-center text-xs font-semibold text-gray-900">
+                          Weightage (%)
+                        </th>
+                        <th className="border border-gray-200 px-4 py-3 text-center text-xs font-semibold text-gray-900">
+                          Score
+                        </th>
+                        <th className="border border-gray-200 bg-amber-50 px-4 py-3 text-center text-xs font-semibold text-amber-900">
+                          Rating (1-10)
+                        </th>
+                        <th className="border border-gray-200 bg-amber-50 px-4 py-3 text-center text-xs font-semibold text-amber-900">
+                          Weightage (%)
+                        </th>
+                        <th className="border border-gray-200 bg-amber-50 px-4 py-3 text-center text-xs font-semibold text-amber-900">
+                          Score
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {kras.map((kra, index) => {
+                        const { title } = getKraParts(kra.kpi);
 
-                    <h3 className="text-sm font-bold text-gray-900 mb-3">
-                      KRA / KPI
-                    </h3>
-                    <p className="text-sm text-gray-700 leading-relaxed">
-                      {currentKRA.kpi}
-                    </p>
-                  </div>
-
-                  {currentKRA.status && (
-                    <span
-                      className={`ml-4 flex-shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium ${
-                        currentKRA.status === "Approved"
-                          ? "bg-green-100 text-green-700"
-                          : "bg-gray-100 text-gray-700"
-                      }`}
-                    >
-                      {currentKRA.status === "Approved" && (
-                        <CheckCircle className="w-3.5 h-3.5" />
-                      )}
-                      {currentKRA.status}
-                    </span>
-                  )}
+                        return (
+                          <tr
+                            key={kra.id}
+                            className="bg-white align-top hover:bg-blue-50/40"
+                          >
+                            <td className="border border-gray-200 px-3 py-4 text-center text-sm text-gray-700">
+                              {kra.sl}
+                            </td>
+                            <td className="border border-gray-200 px-4 py-4">
+                              <div className="text-sm font-semibold text-gray-900">
+                                {title}
+                              </div>
+                            </td>
+                            <td className="border border-gray-200 px-4 py-3 text-center align-middle">
+                              <button
+                                type="button"
+                                onClick={() => openKraDetails(index)}
+                                className="inline-flex h-9 w-9 items-center justify-center rounded-full text-blue-600 transition-colors hover:bg-blue-50"
+                                aria-label={`View ${kra.code} details`}
+                              >
+                                <Eye className="h-4 w-4" />
+                              </button>
+                            </td>
+                            <td className="border border-gray-200 px-4 py-3 text-center text-sm font-semibold text-gray-900">
+                              {kra.ro.rating || "-"}
+                            </td>
+                            <td className="border border-gray-200 px-4 py-3 text-center text-sm text-gray-700">
+                              {kra.ro.weightagePercent || "-"}
+                            </td>
+                            <td className="border border-gray-200 px-4 py-3 text-center text-sm font-semibold text-blue-600">
+                              {kra.ro.score || "-"}
+                            </td>
+                            <td className="border border-gray-200 bg-amber-50/40 px-4 py-3">
+                              <select
+                                className="w-full rounded-lg border border-amber-200 bg-white px-3 py-2 text-sm focus:border-transparent focus:ring-2 focus:ring-amber-500"
+                                value={kra.rvo.rating}
+                                onChange={(e) => {
+                                  const newKras = [...kras];
+                                  newKras[index].rvo.rating = e.target.value;
+                                  newKras[index].rvo.score = calculateKRAScore(
+                                    e.target.value,
+                                    newKras[index].ro.weightagePercent,
+                                  );
+                                  setKras(newKras);
+                                }}
+                              >
+                                <option value="">Select</option>
+                                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
+                                  <option key={num} value={num}>
+                                    {num}
+                                  </option>
+                                ))}
+                              </select>
+                            </td>
+                            <td className="border border-gray-200 bg-amber-50/40 px-4 py-3 text-center text-sm font-semibold text-gray-700">
+                              {kra.ro.weightagePercent || "-"}
+                            </td>
+                            <td className="border border-gray-200 bg-amber-50/40 px-4 py-3 text-center text-sm font-semibold text-amber-700">
+                              {kra.rvo.score || "-"}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
                 </div>
+              </div>
 
-                <div className="h-px bg-gray-200"></div>
+              <Dialog
+                open={isKraDialogOpen}
+                onOpenChange={setIsKraDialogOpen}
+              >
+                <DialogContent className="max-w-[460px] gap-0 overflow-hidden p-0">
+                  <DialogHeader className="border-b border-gray-200 px-5 py-4">
+                    <DialogTitle className="text-base font-semibold text-gray-900">
+                      KRA / KPI Details
+                    </DialogTitle>
+                    <DialogDescription className="sr-only">
+                      Detailed KRA information
+                    </DialogDescription>
+                  </DialogHeader>
 
-                {/* Target & Achievement Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-semibold text-gray-600 uppercase tracking-wide mb-2">
-                      Target (Annual)
-                    </label>
-                    <p className="text-sm text-gray-900">
-                      {currentKRA.targetAnnual}
-                    </p>
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-semibold text-gray-600 uppercase tracking-wide mb-2">
-                      Actual Achievement
-                    </label>
-                    <p className="text-sm text-gray-900">
-                      {currentKRA.actualAchievement}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="h-px bg-gray-200"></div>
-
-                {/* Source Ref & Files */}
-                <div className="space-y-3">
-                  {/* Collapsible Header */}
-                  <button
-                    onClick={() =>
-                      setShowSourceDetails(!showSourceDetails)
-                    }
-                    className="w-full flex items-center justify-between py-2 hover:bg-gray-50 rounded-lg transition-colors"
-                  >
-                    <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">
-                      Source & Attachments
-                    </span>
-                    {showSourceDetails ? (
-                      <ChevronUp className="w-4 h-4 text-gray-500" />
-                    ) : (
-                      <ChevronDown className="w-4 h-4 text-gray-500" />
-                    )}
-                  </button>
-
-                  {/* Collapsible Content */}
-                  {showSourceDetails && (
-                    <div className="space-y-3 pl-2">
-                      <div>
-                        <label className="block text-xs font-semibold text-gray-600 uppercase tracking-wide mb-2">
-                          Source Ref No.
-                        </label>
-                        <p className="text-sm text-gray-900 font-mono">
-                          {currentKRA.sourceRefNo}
-                        </p>
-                      </div>
-
-                      {currentKRA.uploadedFiles &&
-                        currentKRA.uploadedFiles.length > 0 && (
+                  <div className="max-h-[70vh] overflow-y-auto px-5 py-4">
+                    <div className="space-y-5">
+                      <section className="space-y-3">
+                        <h3 className="text-sm font-semibold text-blue-600">
+                          Basic Information
+                        </h3>
+                        <div className="space-y-3 text-sm">
                           <div>
-                            <label className="block text-xs font-semibold text-gray-600 uppercase tracking-wide mb-2">
-                              Attached Files (
-                              {currentKRA.uploadedFiles.length})
-                            </label>
-                            <div className="flex flex-wrap gap-2">
-                              {currentKRA.uploadedFiles.map(
-                                (file, idx) => (
-                                  <a
-                                    key={idx}
-                                    href={file.url}
-                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg text-xs font-medium hover:bg-blue-100 transition-colors"
-                                  >
-                                    <svg
-                                      className="w-3.5 h-3.5"
-                                      fill="none"
-                                      stroke="currentColor"
-                                      viewBox="0 0 24 24"
-                                    >
-                                      <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth={2}
-                                        d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"
-                                      />
-                                    </svg>
-                                    {file.name}
-                                  </a>
-                                ),
-                              )}
+                            <div className="mb-1 text-xs font-medium text-gray-500">
+                              KRA / KPI Title
+                            </div>
+                            <div className="font-medium text-gray-900">
+                              {getKraParts(currentKRA.kpi).title}
                             </div>
                           </div>
-                        )}
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              <div className="h-px bg-gray-300"></div>
-
-              {/* RO Evaluation Section - Read Only */}
-              <div className="space-y-4">
-                <h3 className="text-sm font-bold text-gray-900">
-                  RO Evaluation (Submitted)
-                </h3>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {/* Rating */}
-                  <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-2">
-                      Rating (1-10)
-                    </label>
-                    <div className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg bg-gray-50 text-gray-900 font-semibold">
-                      {currentKRA.ro.rating || "-"}
-                    </div>
-                  </div>
-
-                  {/* Weightage */}
-                  <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-2">
-                      Weightage (%)
-                    </label>
-                    <div className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg bg-gray-50 text-gray-900 font-semibold">
-                      {currentKRA.ro.weightagePercent || "-"}
-                    </div>
-                  </div>
-
-                  {/* Score */}
-                  <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-2">
-                      Score
-                    </label>
-                    <div className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg bg-blue-50 text-blue-600 font-semibold">
-                      {currentKRA.ro.score || "-"}
-                    </div>
-                  </div>
-                </div>
-
-                {/* RO Validation Notes */}
-                {currentKRA.ro.validationNotes && (
-                  <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-2">
-                      RO's Validation Notes
-                    </label>
-                    <div className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg bg-gray-50 text-gray-700">
-                      {currentKRA.ro.validationNotes}
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Revise Ratings Toggle Button */}
-              {!reviseKRAMode && (
-                <div className="flex justify-center">
-                  <button
-                    onClick={() => setReviseKRAMode(true)}
-                    className="flex items-center gap-2 px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 font-medium transition-colors"
-                  >
-                    <RefreshCw className="w-4 h-4" />
-                    Revise Ratings
-                  </button>
-                </div>
-              )}
-
-              {/* RVO Revision Section */}
-              {reviseKRAMode && (
-                <>
-                  <div className="h-px bg-gray-200"></div>
-
-                  <div className="space-y-4 bg-amber-50 border border-amber-200 rounded-lg p-4">
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-sm font-bold text-amber-900">
-                        RVO Revision
-                      </h3>
-                      <button
-                        onClick={() => setReviseKRAMode(false)}
-                        className="text-xs text-amber-700 hover:text-amber-900 underline"
-                      >
-                        Cancel Revision
-                      </button>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      {/* Rating */}
-                      <div>
-                        <label className="block text-xs font-medium text-gray-700 mb-2">
-                          Revised Rating (1-10){" "}
-                          <span className="text-red-600">*</span>
-                        </label>
-                        <select
-                          className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-white"
-                          value={currentKRA.rvo.rating}
-                          onChange={(e) => {
-                            const newKras = [...kras];
-                            newKras[currentKRAIndex].rvo.rating =
-                              e.target.value;
-                            newKras[currentKRAIndex].rvo.score =
-                              calculateKRAScore(
-                                e.target.value,
-                                newKras[currentKRAIndex].ro
-                                  .weightagePercent,
-                              );
-                            setKras(newKras);
-                          }}
-                        >
-                          <option value="">Select rating</option>
-                          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(
-                            (num) => (
-                              <option key={num} value={num}>
-                                {num}
-                              </option>
-                            ),
-                          )}
-                        </select>
-                      </div>
-
-                      {/* Weightage (Read-only from RO) */}
-                      <div>
-                        <label className="block text-xs font-medium text-gray-700 mb-2">
-                          Weightage (%)
-                        </label>
-                        <div className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg bg-gray-50 text-gray-900 font-semibold">
-                          {currentKRA.ro.weightagePercent || "-"}
+                          <div>
+                            <div className="mb-1 text-xs font-medium text-gray-500">
+                              Description
+                            </div>
+                            <div className="text-gray-700">
+                              {getKraParts(currentKRA.kpi).description}
+                            </div>
+                          </div>
+                          <div>
+                            <div className="mb-1 text-xs font-medium text-gray-500">
+                              Target (Annual)
+                            </div>
+                            <div className="text-gray-700">
+                              {currentKRA.targetAnnual}
+                            </div>
+                          </div>
+                          <div>
+                            <div className="mb-1 text-xs font-medium text-gray-500">
+                              Actual Achievement
+                            </div>
+                            <div className="text-gray-700">
+                              {currentKRA.actualAchievement}
+                            </div>
+                          </div>
                         </div>
-                      </div>
+                      </section>
 
-                      {/* Score (Auto-calculated) */}
-                      <div>
-                        <label className="block text-xs font-medium text-gray-700 mb-2">
-                          Revised Score
-                        </label>
-                        <div className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg bg-amber-100 text-amber-700 font-semibold">
-                          {currentKRA.rvo.score || "-"}
+                      <div className="h-px bg-gray-200" />
+
+                      <section className="space-y-3">
+                        <h3 className="text-sm font-semibold text-blue-600">
+                          Source & Attachments
+                        </h3>
+                        <div className="space-y-3 text-sm">
+                          <div>
+                            <div className="mb-1 text-xs font-medium text-gray-500">
+                              Source Reference No.
+                            </div>
+                            <div className="text-gray-700">
+                              {currentKRA.sourceRefNo}
+                            </div>
+                          </div>
+                          <div>
+                            <div className="mb-2 text-xs font-medium text-gray-500">
+                              Attachments ({currentKRA.uploadedFiles.length})
+                            </div>
+                            <div className="flex flex-wrap gap-2">
+                              {currentKRA.uploadedFiles.map((file, index) => (
+                                <a
+                                  key={index}
+                                  href={file.url}
+                                  className="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-600 transition-colors hover:bg-blue-100"
+                                >
+                                  {file.name}
+                                </a>
+                              ))}
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                    </div>
+                      </section>
 
-                    {/* RVO Validation Notes */}
-                    <div className="space-y-2">
-                      <label className="block text-xs font-medium text-gray-700">
-                        RVO's Validation Notes{" "}
-                        <span className="text-red-600">*</span>
-                      </label>
-                      <textarea
-                        rows={3}
-                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent resize-none bg-white"
-                        placeholder="Provide justification for the revision..."
-                        value={currentKRA.rvo.validationNotes}
-                        onChange={(e) => {
-                          const newKras = [...kras];
-                          newKras[
-                            currentKRAIndex
-                          ].rvo.validationNotes = e.target.value;
-                          setKras(newKras);
-                        }}
-                      />
+                      <div className="h-px bg-gray-200" />
+
+                      <section className="space-y-3">
+                        <h3 className="text-sm font-semibold text-blue-600">
+                          Employee Notes
+                        </h3>
+                        <p className="text-sm text-gray-700">
+                          {currentKRA.employeeNotes}
+                        </p>
+                      </section>
                     </div>
                   </div>
-                </>
-              )}
+
+                  <DialogFooter className="border-t border-gray-200 px-5 py-3">
+                    <button
+                      type="button"
+                      onClick={() => setIsKraDialogOpen(false)}
+                      className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
+                    >
+                      Close
+                    </button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
             </div>
           </div>
         );
@@ -1663,6 +1530,15 @@ const RVOReview = () => {
                 <div className="space-y-3">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                      KRA/KPI Validation Notes
+                    </label>
+                    <div className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-sm text-gray-700">
+                      {kraKpiValidationNotes}
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
                       Key outcomes delivered
                     </label>
                     <div className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-sm text-gray-700">
@@ -1731,6 +1607,21 @@ const RVOReview = () => {
                 </div>
                 <div className="p-3 md:p-4 md:pb-10">
                   <div className="space-y-3">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                        KRA/KPI Validation Notes
+                      </label>
+                      <textarea
+                        rows={2}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-white"
+                        placeholder="Enter KRA/KPI validation notes..."
+                        value={rvoKraKpiValidationNotes}
+                        onChange={(e) =>
+                          setRvoKraKpiValidationNotes(e.target.value)
+                        }
+                      />
+                    </div>
+
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1.5">
                         Key outcomes delivered
@@ -2198,6 +2089,32 @@ const RVOReview = () => {
                             rvoCompetencyRatings,
                             functionalCompetencies,
                           )}
+                        </span>
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Overall Summary */}
+                  <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                    <h3 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
+                      <CheckCircle className="w-4 h-4 text-green-600" />
+                      Overall Summary
+                    </h3>
+                    <p className="text-sm text-gray-600">
+                      RO KRA/KPI Validation Notes:{" "}
+                      <span className="font-medium text-gray-900">
+                        {kraKpiValidationNotes || "Not provided"}
+                      </span>
+                    </p>
+                    {(rvoKraKpiValidationNotes ||
+                      rvoKeyOutcomes ||
+                      rvoStrengths ||
+                      rvoAreasForImprovement ||
+                      rvoOverallAssessment) && (
+                      <p className="text-sm text-gray-600 mt-1">
+                        RVO KRA/KPI Validation Notes:{" "}
+                        <span className="font-medium text-amber-700">
+                          {rvoKraKpiValidationNotes || "Not provided"}
                         </span>
                       </p>
                     )}
